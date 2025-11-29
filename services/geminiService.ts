@@ -118,26 +118,29 @@ export const generateHairstyleImage = async (
   
   // 1. Add Subject Images
   if (images.front) {
+    const [mimeType, data] = images.front.split(';base64,');
     parts.push({
       inlineData: {
-        mimeType: 'image/jpeg',
-        data: images.front.split(',')[1] // Remove data URL prefix
+        mimeType: mimeType.split(':')[1] || 'image/jpeg',
+        data: data
       }
     });
   }
   if (images.side) {
+    const [mimeType, data] = images.side.split(';base64,');
     parts.push({
       inlineData: {
-        mimeType: 'image/jpeg',
-        data: images.side.split(',')[1]
+        mimeType: mimeType.split(':')[1] || 'image/jpeg',
+        data: data
       }
     });
   }
   if (images.back) {
+    const [mimeType, data] = images.back.split(';base64,');
     parts.push({
       inlineData: {
-        mimeType: 'image/jpeg',
-        data: images.back.split(',')[1]
+        mimeType: mimeType.split(':')[1] || 'image/jpeg',
+        data: data
       }
     });
   }
@@ -145,10 +148,11 @@ export const generateHairstyleImage = async (
   // 2. Add Style Reference Image (if provided)
   // We place this LAST in the image sequence so we can refer to it easily in the prompt
   if (styleReferenceImage) {
+    const [mimeType, data] = styleReferenceImage.split(';base64,');
     parts.push({
       inlineData: {
-        mimeType: 'image/jpeg',
-        data: styleReferenceImage.split(',')[1]
+        mimeType: mimeType.split(':')[1] || 'image/jpeg',
+        data: data
       }
     });
   }
@@ -188,9 +192,7 @@ export const generateHairstyleImage = async (
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-pro-image-preview',
-      contents: {
-        parts: parts
-      },
+      contents: parts,
       config: {
         imageConfig: {
             aspectRatio: "16:9",
@@ -223,19 +225,21 @@ export const refineHairstyleImage = async (
   const parts: any[] = [];
 
   // 1. Current Image (The one to be edited)
+  const [mimeType, data] = currentImage.split(';base64,');
   parts.push({
     inlineData: {
-      mimeType: 'image/jpeg',
-      data: currentImage.split(',')[1] 
+      mimeType: mimeType.split(':')[1] || 'image/jpeg',
+      data: data
     }
   });
 
   // 2. Optional Style Reference Image
   if (styleReferenceImage) {
+    const [refMimeType, refData] = styleReferenceImage.split(';base64,');
     parts.push({
       inlineData: {
-        mimeType: 'image/jpeg',
-        data: styleReferenceImage.split(',')[1]
+        mimeType: refMimeType.split(':')[1] || 'image/jpeg',
+        data: refData
       }
     });
   }
@@ -264,9 +268,7 @@ export const refineHairstyleImage = async (
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-pro-image-preview',
-      contents: {
-        parts: parts
-      },
+      contents: parts,
       config: {
         imageConfig: {
             aspectRatio: "16:9",
