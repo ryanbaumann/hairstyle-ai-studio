@@ -1,0 +1,8 @@
+
+{
+  "name": "HairStyle AI Studio",
+  "description": "Try out new hairstyles using advanced Gemini AI. Upload your photo and see yourself with a fresh look in seconds.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
