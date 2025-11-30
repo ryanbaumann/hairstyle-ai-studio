@@ -8,7 +8,8 @@ import { MarketingModal } from './components/MarketingModal';
 import { generateHairstyleImage, refineHairstyleImage, generateTitleFromPrompt } from './services/geminiService';
 import { saveImage, getImage, clearAllImages } from './services/imageStorage';
 import { AppState, GeneratedImage, ViewType } from './types';
-import { Sparkles, Scissors, Loader2, ChevronRight, Check, Zap, Trash2 } from 'lucide-react';
+import { Sparkles, Scissors, Loader2, ChevronRight, Check, Zap, Trash2, Star } from 'lucide-react';
+import { LoadingSpinner } from './components/LoadingSpinner';
 
 // Simplified, Faster Loading View (20s)
 const LoadingView = () => {
@@ -45,48 +46,12 @@ const LoadingView = () => {
 
   return (
     <div className="max-w-xl mx-auto text-center py-32 animate-fadeIn select-none">
-
-      {/* Sleek Progress Ring - Fixed SVG ViewBox to prevent cutting off */}
-      <div className="relative w-32 h-32 mx-auto mb-10">
-        <svg
-          className="w-full h-full transform -rotate-90"
-          viewBox="0 0 128 128"
-        >
-          {/* Background Circle */}
-          <circle
-            cx="64"
-            cy="64"
-            r="58"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="8"
-            className="text-gray-200 dark:text-gray-800"
-          />
-          {/* Progress Circle */}
-          <circle
-            cx="64"
-            cy="64"
-            r="58"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="8"
-            strokeLinecap="round"
-            strokeDasharray={364} // 2 * pi * 58
-            strokeDashoffset={364 - (364 * progress) / 100}
-            className="text-primary-600 transition-all duration-300 ease-linear"
-          />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <Sparkles className="text-primary-500 animate-pulse" size={32} />
-        </div>
-      </div>
-
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3 min-h-[2rem] transition-all">
-        {MESSAGES[messageIdx]}
-      </h2>
-      <p className="text-gray-500 dark:text-gray-400 text-sm">
-        {progress < 100 ? "This usually takes about 20 seconds." : "Almost there! Still working..."}
-      </p>
+      <LoadingSpinner 
+        progress={progress}
+        message={MESSAGES[messageIdx]}
+        subMessage={progress < 100 ? "This usually takes about 20 seconds." : "Almost there! Still working..."}
+        size="lg"
+      />
     </div>
   );
 };
@@ -391,7 +356,7 @@ export const App = () => {
                 title="Clear History"
               >
                 <Trash2 size={14} />
-                <span className="hidden sm:inline">Clear</span>
+                <span className="hidden sm:inline">Clear all</span>
               </button>
             )}
             <ThemeToggle />
@@ -441,6 +406,39 @@ export const App = () => {
           />
         )}
       </main>
+
+      {/* Pro Banner Footer */}
+      <footer className="border-t border-gray-200 dark:border-gray-800 bg-transparent mt-auto">
+        <div className="max-w-6xl mx-auto px-4 py-4">
+          <div className="bg-gradient-to-r from-primary-600 to-indigo-600 dark:from-primary-900 dark:to-indigo-900 rounded-xl px-4 py-2.5 text-white flex items-center justify-between gap-4 shadow-lg relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-2 opacity-10">
+                  <Star size={60} />
+              </div>
+              <div className="relative z-10 flex items-center gap-3">
+                  <div className="p-1.5 bg-white/20 rounded-lg backdrop-blur-sm">
+                    <Star className="text-yellow-300 fill-yellow-300" size={18} /> 
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-white leading-tight">
+                        Unlock Pro Features
+                    </h3>
+                    <p className="text-indigo-100 text-[10px] leading-tight max-w-md hidden sm:block">
+                        Get access to 4K resolution and advanced features.
+                    </p>
+                  </div>
+              </div>
+              <button 
+                  onClick={() => setState(prev => ({ ...prev, isMarketingModalOpen: true }))}
+                  className="relative z-10 px-4 py-1.5 bg-white text-primary-700 text-xs font-bold rounded-lg hover:bg-indigo-50 transition-colors whitespace-nowrap shadow-sm"
+              >
+                  Join Waitlist
+              </button>
+          </div>
+          <div className="mt-4 text-center text-[10px] text-gray-500 dark:text-gray-400">
+            © {new Date().getFullYear()} Hairstyle AI Studio. All rights reserved.
+          </div>
+        </div>
+      </footer>
 
       <MarketingModal
         isOpen={state.isMarketingModalOpen}

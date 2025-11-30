@@ -4,6 +4,7 @@ import { RotateCcw, Download, History, Calendar, Star, Loader2, Edit3, Scissors,
 import { GeneratedImage } from '../types';
 import { PromptInput } from './PromptInput';
 import { MarkdownText } from './MarkdownText';
+import { LoadingSpinner } from './LoadingSpinner';
 
 interface StepResultProps {
   result: GeneratedImage;
@@ -78,11 +79,15 @@ export const StepResult: React.FC<StepResultProps> = ({
   };
 
   const toggleRefinement = (option: string) => {
-    setSelectedRefinements(prev => 
-      prev.includes(option) 
-        ? prev.filter(o => o !== option)
-        : [...prev, option]
-    );
+    setRefinementText(prev => {
+      if (prev.includes(option)) {
+        // Remove option and clean up commas
+        return prev.replace(new RegExp(`,?\\s*${option}`), '').replace(/^,\s*/, '');
+      } else {
+        // Add option
+        return prev ? `${prev}, ${option}` : option;
+      }
+    });
   };
 
   return (
@@ -171,11 +176,11 @@ export const StepResult: React.FC<StepResultProps> = ({
             {/* Refining Overlay */}
             {isRefining && (
               <div className="absolute inset-2 bg-white/80 dark:bg-black/60 backdrop-blur-sm rounded-xl flex flex-col items-center justify-center z-20 animate-fadeIn">
-                <div className="bg-white dark:bg-gray-800 p-4 rounded-full shadow-xl mb-4">
-                  <Loader2 size={32} className="text-primary-600 animate-spin" />
-                </div>
-                <p className="text-lg font-bold text-gray-900 dark:text-white">Refining your look...</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Applying changes</p>
+                <LoadingSpinner 
+                  message="Refining your look..."
+                  subMessage="Applying changes"
+                  size="md"
+                />
               </div>
             )}
         </div>
@@ -213,13 +218,13 @@ export const StepResult: React.FC<StepResultProps> = ({
                               key={option}
                               onClick={() => toggleRefinement(option)}
                               disabled={isRefining}
-                              className={`
-                                text-left text-xs px-2.5 py-1.5 rounded-lg border transition-all
-                                ${selectedRefinements.includes(option)
-                                  ? 'bg-primary-100 dark:bg-primary-900/30 border-primary-500 text-primary-700 dark:text-primary-300'
-                                  : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-primary-400 dark:hover:border-primary-500 hover:text-primary-700 dark:hover:text-primary-300'}
-                              `}
-                           >
+                                className={`
+                                  text-left text-xs px-2.5 py-1.5 rounded-lg border transition-all
+                                  ${refinementText.includes(option)
+                                    ? 'bg-primary-100 dark:bg-primary-900/30 border-primary-500 text-primary-700 dark:text-primary-300'
+                                    : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-primary-400 dark:hover:border-primary-500 hover:text-primary-700 dark:hover:text-primary-300'}
+                                `}
+                             >
                               {option}
                            </button>
                         ))}
@@ -229,27 +234,7 @@ export const StepResult: React.FC<StepResultProps> = ({
             </div>
         </div>
 
-        {/* Pro Banner */}
-        <div className="bg-gradient-to-r from-gray-900 to-gray-800 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-6 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-8 opacity-10">
-                <Star size={120} />
-            </div>
-            <div className="relative z-10">
-                <h3 className="text-xl font-bold mb-1 flex items-center gap-2">
-                    <Star className="text-yellow-400 fill-yellow-400" size={20} /> 
-                    Unlock Pro Features
-                </h3>
-                <p className="text-gray-300 text-sm max-w-md">
-                    Get access to 4K resolution, advanced color matching, and realistic video previews.
-                </p>
-            </div>
-            <button 
-                onClick={() => onCtaClick('pro')}
-                className="relative z-10 px-6 py-2 bg-white text-gray-900 font-bold rounded-lg hover:bg-gray-100 transition-colors whitespace-nowrap"
-            >
-                Join Waitlist
-            </button>
-        </div>
+        {/* Pro Banner removed from here, moved to App.tsx footer */}
 
       </div>
     </div>
