@@ -91,7 +91,7 @@ To optimize PNG images to JPG and move them to the correct directory:
 
 ```bash
 for f in public/images/*.png; do sips -s format jpeg -s formatOptions 80 "$f" --out "${f%.png}.jpg" && rm "$f"; done
-mv public/images/*.jpg images/optimized/
+mv public/images/*.jpg public/images/optimized/
 ```
 
 ## 📄 License
