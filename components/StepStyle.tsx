@@ -18,28 +18,28 @@ interface StepStyleProps {
 
 const STYLE_PRINCIPLES = [
   {
-    id: 'length',
-    label: 'Length',
-    icon: Ruler,
-    options: ['Pixie', 'Short', 'Chin-length', 'Shoulder-length', 'Mid-back', 'Long', 'Buzz Cut', 'Bald']
-  },
-  {
-    id: 'texture',
-    label: 'Texture',
-    icon: Waves,
-    options: ['Straight', 'Wavy', 'Curly', 'Coily', 'Messy', 'Layered', 'Choppy', 'Sleek']
+    id: 'cut',
+    label: 'Cut & Shape',
+    icon: Scissors,
+    options: ['Pixie', 'Bob', 'Lob', 'Shag', 'Wolf Cut', 'Mullet', 'Layered', 'Blunt', 'Undercut', 'Fade']
   },
   {
     id: 'color',
-    label: 'Color',
+    label: 'Color & Tone',
     icon: Palette,
-    options: ['Platinum Blonde', 'Honey Blonde', 'Brunette', 'Jet Black', 'Copper Red', 'Silver', 'Pastel Pink', 'Neon Blue', 'Balayage', 'Ombre']
+    options: ['Platinum', 'Balayage', 'Money Piece', 'Copper', 'Espresso', 'Pastel', 'Neon', 'Silver', 'Ombre']
   },
   {
-    id: 'style',
-    label: 'Key Styles',
-    icon: LayoutGrid,
-    options: ['Bob', 'Lob', 'Shag', 'Mullet', 'Wolf Cut', 'Curtain Bangs', 'Fade', 'Undercut', 'French Bob', 'Beach Waves']
+    id: 'texture',
+    label: 'Texture & Finish',
+    icon: Waves,
+    options: ['Messy', 'Sleek', 'Wavy', 'Curly', 'Coily', 'Braided', 'Glass Hair', 'Voluminous']
+  },
+  {
+    id: 'aesthetic',
+    label: 'Aesthetic',
+    icon: Sparkles,
+    options: ['Y2K', 'Old Money', 'Clean Girl', 'Edgy', 'Soft Girl', 'Cyberpunk', 'Boho']
   }
 ];
 
@@ -48,22 +48,22 @@ const STYLES = [
     category: "Trending Women",
     items: [
       {
-        id: 'butterfly-cut',
-        label: 'Butterfly Cut',
-        desc: 'Voluminous, heavily layered 90s blowout',
-        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/butterfly-cut-woman.jpg'
+        id: 'wolf-cut',
+        label: 'Wolf Cut',
+        desc: 'Textured layers with balayage highlights',
+        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/wolf-cut-balayage-woman.jpg'
       },
       {
-        id: 'cowgirl-copper',
-        label: 'Cowgirl Copper',
-        desc: 'Long waves in warm, reddish-brown tones',
-        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/cowgirl-copper-woman.jpg'
+        id: 'copper-shag',
+        label: 'Copper Shag',
+        desc: 'Textured copper shag hairstyle',
+        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/copper-shag-woman.jpg'
       },
       {
-        id: 'italian-bob',
-        label: 'Italian Bob',
-        desc: 'Chin-length, blunt tips with airy volume',
-        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/italian-bob-woman.jpg'
+        id: 'glass-bob',
+        label: 'Glass Bob',
+        desc: 'Sleek, espresso glass-hair bob',
+        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/sleek-glass-bob-woman.jpg'
       },
     ]
   },
@@ -86,7 +86,7 @@ const STYLES = [
         id: 'the-flow',
         label: 'The Flow',
         desc: 'Medium length, pushed back, natural waves',
-        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/the-flow-man.jpg'
+        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/long-flow-man.jpg'
       },
     ]
   }
@@ -152,11 +152,27 @@ export const StepStyle: React.FC<StepStyleProps> = ({
 
   const handleAddToken = (token: string) => {
     let newVal = inputValue.trim();
-    if (!newVal) {
-      newVal = token;
+    const tokenLower = token.toLowerCase();
+    
+    // Check if token already exists (simple check)
+    const exists = newVal.toLowerCase().includes(tokenLower);
+    
+    if (exists) {
+      // Remove token if it exists (rudimentary removal)
+      // This is a bit tricky with comma separation, but let's try a simple replace
+      const regex = new RegExp(`(^|,\\s*)${token}(,\\s*|$)`, 'i');
+      newVal = newVal.replace(regex, (match, p1, p2) => {
+        if (p1 && p2) return ', '; // Kept between two other tokens
+        return ''; // At beginning or end
+      }).trim();
+      
+      // Clean up multiple commas or trailing/leading commas
+      newVal = newVal.replace(/^,\s*/, '').replace(/,\s*$/, '').replace(/,\s*,/g, ',');
     } else {
-      // Avoid duplicate tokens if simple check passes
-      if (!newVal.toLowerCase().includes(token.toLowerCase())) {
+      // Add token
+      if (!newVal) {
+        newVal = token;
+      } else {
         newVal = `${newVal}, ${token}`;
       }
     }
@@ -201,24 +217,37 @@ export const StepStyle: React.FC<StepStyleProps> = ({
           <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200">Build Your Style</h3>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {STYLE_PRINCIPLES.map((category) => (
-            <div key={category.id} className="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-100 dark:border-gray-800 shadow-sm">
-              <div className="flex items-center gap-2 mb-3 text-gray-500 dark:text-gray-400">
-                <category.icon size={14} />
-                <span className="text-xs font-bold uppercase tracking-wider">{category.label}</span>
+            <div key={category.id} className="bg-white dark:bg-gray-900 rounded-xl p-3 border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col">
+              <div className="flex items-center gap-2 mb-2 text-gray-500 dark:text-gray-400">
+                <category.icon size={13} />
+                <span className="text-[10px] font-bold uppercase tracking-wider">{category.label}</span>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {category.options.map((option) => (
-                  <button
-                    key={option}
-                    onClick={() => handleAddToken(option)}
-                    className="text-xs font-medium px-2.5 py-1.5 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-primary-400 dark:hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors flex items-center gap-1 group"
-                  >
-                    {option}
-                    <Plus size={10} className="opacity-0 group-hover:opacity-100 transition-opacity text-primary-500" />
-                  </button>
-                ))}
+              <div className="flex flex-wrap gap-1.5">
+                {category.options.map((option) => {
+                  const isSelected = inputValue.toLowerCase().includes(option.toLowerCase());
+                  return (
+                    <button
+                      key={option}
+                      onClick={() => handleAddToken(option)}
+                      className={`
+                        text-xs font-medium px-2 py-1 rounded-md transition-all duration-200 flex items-center gap-1 group
+                        ${isSelected 
+                          ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border-primary-200 dark:border-primary-800' 
+                          : 'bg-gray-50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-300 border-gray-100 dark:border-gray-800 hover:border-primary-300 dark:hover:border-primary-700 hover:bg-gray-100 dark:hover:bg-gray-800'}
+                        border
+                      `}
+                    >
+                      {option}
+                      {isSelected ? (
+                        <X size={10} className="text-primary-500" />
+                      ) : (
+                        <Plus size={10} className="opacity-0 group-hover:opacity-100 transition-opacity text-primary-500" />
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           ))}

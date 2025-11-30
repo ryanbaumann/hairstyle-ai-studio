@@ -16,9 +16,9 @@
 
 ### Sample Hairstyles
 <div align="center">
-  <img src="https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/butterfly-cut-woman.jpg" width="30%" alt="Butterfly Cut" />
+  <img src="https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/wolf-cut-balayage-woman.jpg" width="30%" alt="Wolf Cut" />
   <img src="https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/modern-mullet-man.jpg" width="30%" alt="Modern Mullet" />
-  <img src="https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/italian-bob-woman.jpg" width="30%" alt="Italian Bob" />
+  <img src="https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/sleek-glass-bob-woman.jpg" width="30%" alt="Glass Bob" />
 </div>
 
 ## 🛠️ Tech Stack
@@ -71,6 +71,27 @@ To preview the production build locally:
 
 ```bash
 npm run preview
+```
+
+## 🎨 Image Generation & Optimization
+
+The project includes scripts to generate new trending hairstyle images using Google's Gemini API and optimize them for the web.
+
+### 1. Generate Images
+
+To generate new images based on prompts in `scripts/generate_images_gemini.js`:
+
+```bash
+node scripts/generate_images_gemini.js
+```
+
+### 2. Optimize Images
+
+To optimize PNG images to JPG and move them to the correct directory:
+
+```bash
+for f in public/images/*.png; do sips -s format jpeg -s formatOptions 80 "$f" --out "${f%.png}.jpg" && rm "$f"; done
+mv public/images/*.jpg images/optimized/
 ```
 
 ## 📄 License
