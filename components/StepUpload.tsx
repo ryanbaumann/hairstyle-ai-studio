@@ -2,18 +2,20 @@
 import React, { useState } from 'react';
 import { ArrowRight, Sparkles, Scan, Layers, ImageOff } from 'lucide-react';
 import { ImageUpload } from './ImageUpload';
-import { UploadedImages, ViewType } from '../types';
+import { UploadedImages, ViewType, GeneratedImage } from '../types';
 
 interface StepUploadProps {
   images: UploadedImages;
+  history?: GeneratedImage[];
   onUpload: (view: ViewType, base64: string) => void;
   onClear: (view: ViewType) => void;
   onNext: () => void;
+  onJumpToResult: (result: GeneratedImage) => void;
 }
 
 const PREVIEW_IMAGE_DATA = "https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/sample-hairstyle.jpg";
 
-export const StepUpload: React.FC<StepUploadProps> = ({ images, onUpload, onClear, onNext }) => {
+export const StepUpload: React.FC<StepUploadProps> = ({ images, history, onUpload, onClear, onNext, onJumpToResult }) => {
   return (
     <div className="max-w-[1400px] mx-auto animate-fadeIn pb-24 md:pb-12 px-4 md:px-8 relative">
 
@@ -69,6 +71,34 @@ export const StepUpload: React.FC<StepUploadProps> = ({ images, onUpload, onClea
         {/* Right: The Action Area */}
         <div className="lg:col-span-8 w-full">
           <div className="bg-white dark:bg-gray-900/50 p-4 md:p-8 rounded-[2rem] shadow-xl shadow-gray-200/50 dark:shadow-black/20 border border-gray-100 dark:border-gray-800">
+            
+            {/* Resume Session Section */}
+            {history && history.length > 0 && (
+              <div className="mb-6 p-4 bg-primary-50 dark:bg-primary-900/20 rounded-xl border border-primary-100 dark:border-primary-800 flex items-center justify-between gap-4 animate-fadeIn">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-800 flex-shrink-0 border border-gray-200 dark:border-gray-700">
+                    {history[0].url && history[0].url.startsWith('data:') ? (
+                      <img src={history[0].url} alt="Last generated" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-100 to-indigo-100 dark:from-primary-900 dark:to-indigo-900">
+                        <Sparkles size={16} className="text-primary-600 dark:text-primary-400" />
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-white text-sm">Resume Session</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">You have {history.length} generated images.</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => onJumpToResult(history[0])}
+                  className="px-4 py-2 bg-white dark:bg-gray-800 text-primary-600 dark:text-primary-400 text-sm font-semibold rounded-lg shadow-sm border border-primary-100 dark:border-primary-700 hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors whitespace-nowrap"
+                >
+                  View Results
+                </button>
+              </div>
+            )}
+
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Step 1: The Canvas</h2>

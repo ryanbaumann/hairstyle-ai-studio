@@ -6,8 +6,9 @@ import { StepStyle } from './components/StepStyle';
 import { StepResult } from './components/StepResult';
 import { MarketingModal } from './components/MarketingModal';
 import { generateHairstyleImage, refineHairstyleImage, generateTitleFromPrompt } from './services/geminiService';
+import { saveImage, getImage, clearAllImages } from './services/imageStorage';
 import { AppState, GeneratedImage, ViewType } from './types';
-import { Sparkles, Scissors, Loader2, ChevronRight, Check, Zap } from 'lucide-react';
+import { Sparkles, Scissors, Loader2, ChevronRight, Check, Zap, Trash2 } from 'lucide-react';
 
 // Simplified, Faster Loading View (20s)
 const LoadingView = () => {
@@ -109,20 +110,40 @@ export const App = () => {
 
   // Persistence Logic
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('hairstyle_history');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        setState(prev => ({ ...prev, history: parsed }));
+    const loadHistory = async () => {
+      try {
+        const saved = localStorage.getItem('hairstyle_history');
+        if (saved) {
+          const parsed: GeneratedImage[] = JSON.parse(saved);
+          // Hydrate images from IndexedDB
+          const hydratedHistory = await Promise.all(parsed.map(async (item) => {
+            if (!item.url.startsWith('data:')) {
+              const savedImage = await getImage(item.id);
+              if (savedImage) {
+                return { ...item, url: savedImage };
+              }
+            }
+            return item;
+          }));
+          setState(prev => ({ ...prev, history: hydratedHistory }));
+        }
+      } catch (e) {
+        console.error("Failed to load history", e);
       }
-    } catch (e) {
-      console.error("Failed to load history", e);
-    }
+    };
+    loadHistory();
   }, []);
 
   useEffect(() => {
     if (state.history.length > 0) {
-      localStorage.setItem('hairstyle_history', JSON.stringify(state.history));
+      // Save metadata to localStorage, but keep base64 out of it if possible
+      // Actually, we can store the ID and a placeholder, and store the real image in IndexedDB
+      const metadataOnly = state.history.map(item => ({
+        ...item,
+        url: item.id // Use ID as placeholder or keep it if it's already a URL. 
+                     // Since we hydrate on load, this is fine.
+      }));
+      localStorage.setItem('hairstyle_history', JSON.stringify(metadataOnly));
     }
   }, [state.history]);
 
@@ -184,6 +205,10 @@ export const App = () => {
         title: title,
         timestamp: Date.now()
       };
+
+      // Save to IndexedDB
+      await saveImage(newResult.id, imageUrl);
+
       setState(prev => ({
         ...prev,
         step: 'result',
@@ -218,6 +243,10 @@ export const App = () => {
         title: title,
         timestamp: Date.now()
       };
+
+      // Save to IndexedDB
+      await saveImage(newResult.id, imageUrl);
+
       setState(prev => ({
         ...prev,
         generatedResult: newResult,
@@ -233,6 +262,14 @@ export const App = () => {
 
   const handleHistorySelect = (item: GeneratedImage) => {
     setState(prev => ({ ...prev, generatedResult: item }));
+  };
+
+  const handleClearHistory = async () => {
+    if (confirm("Are you sure you want to clear your history? This cannot be undone.")) {
+      await clearAllImages();
+      localStorage.removeItem('hairstyle_history');
+      setState(prev => ({ ...prev, history: [], generatedResult: null, step: 'upload' }));
+    }
   };
 
   useEffect(() => {
@@ -326,6 +363,16 @@ export const App = () => {
             </div>
 
             <div className="h-6 w-px bg-gray-200 dark:bg-gray-800 mx-1 hidden sm:block"></div>
+            {state.history.length > 0 && (
+              <button
+                onClick={handleClearHistory}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full transition-colors"
+                title="Clear History"
+              >
+                <Trash2 size={14} />
+                <span className="hidden sm:inline">Clear</span>
+              </button>
+            )}
             <ThemeToggle />
           </div>
         </div>
@@ -335,9 +382,11 @@ export const App = () => {
         {state.step === 'upload' && (
           <StepUpload
             images={state.images}
+            history={state.history}
             onUpload={updateImages}
             onClear={clearImage}
             onNext={() => setState(prev => ({ ...prev, step: 'style' }))}
+            onJumpToResult={(result) => setState(prev => ({ ...prev, step: 'result', generatedResult: result }))}
           />
         )}
 
