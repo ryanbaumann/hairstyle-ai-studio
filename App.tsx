@@ -85,7 +85,7 @@ const LoadingView = () => {
         {MESSAGES[messageIdx]}
       </h2>
       <p className="text-gray-500 dark:text-gray-400 text-sm">
-        This usually takes about 20 seconds.
+        {progress < 100 ? "This usually takes about 20 seconds." : "Almost there! Still working..."}
       </p>
     </div>
   );
@@ -264,6 +264,27 @@ export const App = () => {
     setState(prev => ({ ...prev, generatedResult: item }));
   };
 
+  const handleDeleteHistoryItem = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (confirm("Are you sure you want to delete this image?")) {
+      const { deleteImage } = await import('./services/imageStorage');
+      await deleteImage(id);
+      setState(prev => {
+        const newHistory = prev.history.filter(item => item.id !== id);
+        let newGeneratedResult = prev.generatedResult;
+        if (prev.generatedResult?.id === id) {
+          newGeneratedResult = newHistory.length > 0 ? newHistory[0] : null;
+        }
+        return {
+          ...prev,
+          history: newHistory,
+          generatedResult: newGeneratedResult,
+          step: newHistory.length > 0 ? prev.step : 'upload'
+        };
+      });
+    }
+  };
+
   const handleClearHistory = async () => {
     if (confirm("Are you sure you want to clear your history? This cannot be undone.")) {
       await clearAllImages();
@@ -416,6 +437,7 @@ export const App = () => {
             onRefine={handleRefine}
             isRefining={isRefining}
             onCtaClick={() => setState(prev => ({ ...prev, isMarketingModalOpen: true }))}
+            onDeleteHistoryItem={handleDeleteHistoryItem}
           />
         )}
       </main>

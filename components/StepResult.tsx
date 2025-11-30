@@ -13,6 +13,7 @@ interface StepResultProps {
   onRefine: (text: string, refImage: string | null, refUrl: string | null) => Promise<void>;
   isRefining: boolean;
   onCtaClick: (type: 'book' | 'pro') => void;
+  onDeleteHistoryItem: (id: string, e: React.MouseEvent) => void;
 }
 
 const REFINEMENT_TOOLS = [
@@ -49,11 +50,13 @@ export const StepResult: React.FC<StepResultProps> = ({
   onRestart, 
   onRefine,
   isRefining,
-  onCtaClick
+  onCtaClick,
+  onDeleteHistoryItem
 }) => {
   const [refinementText, setRefinementText] = useState('');
   const [refImage, setRefImage] = useState<string | null>(null);
   const [refUrl, setRefUrl] = useState<string | null>(null);
+  const [selectedRefinements, setSelectedRefinements] = useState<string[]>([]);
 
   const handleDownload = () => {
     const link = document.createElement('a');
@@ -65,15 +68,21 @@ export const StepResult: React.FC<StepResultProps> = ({
   };
 
   const submitRefinement = () => {
-    if ((!refinementText.trim() && !refImage && !refUrl) || isRefining) return;
-    onRefine(refinementText, refImage, refUrl);
+    const combinedText = [refinementText, ...selectedRefinements].filter(Boolean).join(', ');
+    if ((!combinedText.trim() && !refImage && !refUrl) || isRefining) return;
+    onRefine(combinedText, refImage, refUrl);
     setRefinementText('');
     setRefImage(null);
     setRefUrl(null);
+    setSelectedRefinements([]);
   };
 
-  const handleQuickRefine = (option: string) => {
-    onRefine(option, null, null);
+  const toggleRefinement = (option: string) => {
+    setSelectedRefinements(prev => 
+      prev.includes(option) 
+        ? prev.filter(o => o !== option)
+        : [...prev, option]
+    );
   };
 
   return (
@@ -106,6 +115,13 @@ export const StepResult: React.FC<StepResultProps> = ({
                                 {new Date(item.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                             </p>
                         </div>
+                        <button
+                          onClick={(e) => onDeleteHistoryItem(item.id, e)}
+                          className="absolute top-2 right-2 p-1.5 bg-black/50 hover:bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          title="Delete Image"
+                        >
+                          <X size={12} />
+                        </button>
                     </div>
                 </button>
             ))}
@@ -191,18 +207,23 @@ export const StepResult: React.FC<StepResultProps> = ({
                      <div className="flex items-center gap-2 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">
                         <tool.icon size={12} /> {tool.label}
                      </div>
-                     <div className="flex flex-col gap-1.5">
+                      <div className="flex flex-wrap gap-1.5">
                         {tool.options.map((option) => (
                            <button
                               key={option}
-                              onClick={() => handleQuickRefine(option)}
+                              onClick={() => toggleRefinement(option)}
                               disabled={isRefining}
-                              className="text-left text-xs px-3 py-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-primary-400 dark:hover:border-primary-500 hover:text-primary-700 dark:hover:text-primary-300 transition-colors truncate"
+                              className={`
+                                text-left text-xs px-2.5 py-1.5 rounded-lg border transition-all
+                                ${selectedRefinements.includes(option)
+                                  ? 'bg-primary-100 dark:bg-primary-900/30 border-primary-500 text-primary-700 dark:text-primary-300'
+                                  : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-primary-400 dark:hover:border-primary-500 hover:text-primary-700 dark:hover:text-primary-300'}
+                              `}
                            >
                               {option}
                            </button>
                         ))}
-                     </div>
+                      </div>
                   </div>
                ))}
             </div>
