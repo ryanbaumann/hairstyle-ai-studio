@@ -38,30 +38,40 @@
 
 ### Installation
 
-1.  **Clone the repository**:
-    ```bash
-    git clone https://github.com/ryanbaumann/hairstyle-ai-studio.git
-    cd hairstyle-ai-studio
-    ```
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/ryanbaumann/hairstyle-ai-studio.git
+   cd hairstyle-ai-studio
+   ```
 
-2.  **Install dependencies**:
-    ```bash
-    npm install
-    ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-3.  **Set up environment variables**:
-    Create a `.env` file in the root directory and add your Gemini API key:
-    ```env
-    VITE_GEMINI_API_KEY=your_api_key_here
-    ```
+3. Create a `.env` file in the root directory and add your Gemini API key:
+   ```env
+   VITE_GEMINI_API_KEY=your_api_key_here
+   ```
 
-4.  **Run the development server**:
-    ```bash
-    npm run dev
-    ```
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
-5.  **Open the app**:
-    Navigate to `http://localhost:5173` (or the port indicated in your terminal).
+### Building for Production
+
+To create an optimized production build:
+
+```bash
+npm run build
+```
+
+To preview the production build locally:
+
+```bash
+npm run preview
+```
 
 ## 📄 License
 
