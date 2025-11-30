@@ -51,19 +51,19 @@ const STYLES = [
         id: 'butterfly-cut',
         label: 'Butterfly Cut',
         desc: 'Voluminous, heavily layered 90s blowout',
-        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/butterfly-cut-woman.jpeg'
+        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/butterfly-cut-woman.jpg'
       },
       {
         id: 'cowgirl-copper',
         label: 'Cowgirl Copper',
         desc: 'Long waves in warm, reddish-brown tones',
-        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/cowgirl-copper-woman.jpeg'
+        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/cowgirl-copper-woman.jpg'
       },
       {
         id: 'italian-bob',
         label: 'Italian Bob',
         desc: 'Chin-length, blunt tips with airy volume',
-        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/italian-bob-woman.jpeg'
+        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/italian-bob-woman.jpg'
       },
     ]
   },
@@ -74,19 +74,19 @@ const STYLES = [
         id: 'modern-mullet',
         label: 'Modern Mullet',
         desc: 'Textured back, shorter sides, contemporary fade',
-        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/modern-mullet-man.jpeg'
+        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/modern-mullet-man.jpg'
       },
       {
         id: 'textured-crop',
         label: 'Textured Crop',
         desc: 'Skin fade with choppy, matte textured top',
-        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/textured-crop-man.jpeg'
+        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/textured-crop-man.jpg'
       },
       {
         id: 'the-flow',
         label: 'The Flow',
         desc: 'Medium length, pushed back, natural waves',
-        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/the-flow-man.jpeg'
+        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/the-flow-man.jpg'
       },
     ]
   }

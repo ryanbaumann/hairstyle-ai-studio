@@ -11,7 +11,7 @@ interface StepUploadProps {
   onNext: () => void;
 }
 
-const PREVIEW_IMAGE_DATA = "https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/sample-hairstyle.jpeg";
+const PREVIEW_IMAGE_DATA = "https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/sample-hairstyle.jpg";
 
 export const StepUpload: React.FC<StepUploadProps> = ({ images, onUpload, onClear, onNext }) => {
   return (

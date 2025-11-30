@@ -12,13 +12,13 @@
 ## 📸 Screenshots
 
 ### Application Interface
-![Hairstyle AI Studio UI](./images/ui-screenshot.png)
+![Hairstyle AI Studio UI](https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/ui-screenshot.jpg)
 
 ### Sample Hairstyles
 <div align="center">
-  <img src="./images/butterfly-cut-woman.jpeg" width="30%" alt="Butterfly Cut" />
-  <img src="./images/modern-mullet-man.jpeg" width="30%" alt="Modern Mullet" />
-  <img src="./images/italian-bob-woman.jpeg" width="30%" alt="Italian Bob" />
+  <img src="https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/butterfly-cut-woman.jpg" width="30%" alt="Butterfly Cut" />
+  <img src="https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/modern-mullet-man.jpg" width="30%" alt="Modern Mullet" />
+  <img src="https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/italian-bob-woman.jpg" width="30%" alt="Italian Bob" />
 </div>
 
 ## 🛠️ Tech Stack
