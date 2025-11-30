@@ -93,42 +93,20 @@ export const StepResult: React.FC<StepResultProps> = ({
   return (
     <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fadeIn pb-12">
       
-      {/* Sidebar: History */}
-      <div className="lg:col-span-3 order-2 lg:order-1 space-y-4">
+      {/* Sidebar: History (Desktop) */}
+      <div className="hidden lg:block lg:col-span-3 order-2 lg:order-1 space-y-4">
         <div className="flex items-center gap-2 text-gray-900 dark:text-white font-bold text-lg mb-2">
             <History size={20} /> Your Collection
         </div>
         <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
             {history.map((item, idx) => (
-                <button
-                    key={item.id}
-                    onClick={() => onHistorySelect(item)}
-                    className={`
-                        w-full text-left rounded-xl overflow-hidden border transition-all relative group shadow-sm
-                        ${result.id === item.id 
-                            ? 'border-primary-500 ring-2 ring-primary-500/20 bg-primary-50/50 dark:bg-primary-900/10' 
-                            : 'border-gray-200 dark:border-gray-800 hover:border-primary-300 dark:hover:border-primary-700 bg-white dark:bg-gray-800'}
-                    `}
-                >
-                    <div className="flex gap-3 p-2">
-                        <img src={item.url} alt="Thumbnail" className="w-16 h-16 object-cover rounded-lg bg-gray-100" />
-                        <div className="flex-1 min-w-0 flex flex-col justify-center">
-                            <div className="text-sm font-semibold text-gray-900 dark:text-white truncate">
-                                <MarkdownText text={item.title || item.prompt.split('-')[0] || "Custom Look"} />
-                            </div>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                                {new Date(item.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                            </p>
-                        </div>
-                        <button
-                          onClick={(e) => onDeleteHistoryItem(item.id, e)}
-                          className="absolute top-2 right-2 p-1.5 bg-black/50 hover:bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                          title="Delete Image"
-                        >
-                          <X size={12} />
-                        </button>
-                    </div>
-                </button>
+                <HistoryItem 
+                  key={item.id}
+                  item={item}
+                  isSelected={result.id === item.id}
+                  onSelect={onHistorySelect}
+                  onDelete={onDeleteHistoryItem}
+                />
             ))}
         </div>
       </div>
@@ -136,13 +114,32 @@ export const StepResult: React.FC<StepResultProps> = ({
       {/* Main Content */}
       <div className="lg:col-span-9 order-1 lg:order-2 space-y-8">
         
+        {/* Mobile History (Horizontal Scroll) */}
+        <div className="lg:hidden space-y-2 mb-4">
+          <div className="flex items-center gap-2 text-gray-900 dark:text-white font-bold text-sm">
+              <History size={16} /> Your Collection
+          </div>
+          <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 snap-x custom-scrollbar">
+              {history.map((item, idx) => (
+                  <div key={item.id} className="snap-start shrink-0 w-48">
+                    <HistoryItem 
+                      item={item}
+                      isSelected={result.id === item.id}
+                      onSelect={onHistorySelect}
+                      onDelete={onDeleteHistoryItem}
+                    />
+                  </div>
+              ))}
+          </div>
+        </div>
+
         {/* Top Actions */}
         <div className="flex flex-wrap gap-4 justify-between items-center bg-white dark:bg-gray-900 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800">
             <button
                 onClick={onRestart}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors font-medium"
             >
-                <RotateCcw size={18} /> <span className="hidden sm:inline">Start New Look</span>
+                <RotateCcw size={18} /> <span className="hidden sm:inline">Start New Look</span><span className="sm:hidden">New</span>
             </button>
             <div className="flex gap-3">
                 <button
@@ -196,6 +193,7 @@ export const StepResult: React.FC<StepResultProps> = ({
                 url={refUrl}
                 onSubmit={submitRefinement}
                 isGenerating={isRefining}
+                inputClassName="min-h-[60px]"
                 label={
                     <span className="flex items-center gap-2 text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                          <Edit3 size={14} /> Refine & Perfect
@@ -212,23 +210,24 @@ export const StepResult: React.FC<StepResultProps> = ({
                      <div className="flex items-center gap-2 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">
                         <tool.icon size={12} /> {tool.label}
                      </div>
-                      <div className="flex flex-wrap gap-1.5">
-                        {tool.options.map((option) => (
-                           <button
-                              key={option}
-                              onClick={() => toggleRefinement(option)}
-                              disabled={isRefining}
-                                className={`
-                                  text-left text-xs px-2.5 py-1.5 rounded-lg border transition-all
-                                  ${refinementText.includes(option)
-                                    ? 'bg-primary-100 dark:bg-primary-900/30 border-primary-500 text-primary-700 dark:text-primary-300'
-                                    : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-primary-400 dark:hover:border-primary-500 hover:text-primary-700 dark:hover:text-primary-300'}
-                                `}
-                             >
-                              {option}
-                           </button>
-                        ))}
-                      </div>
+                       <div className="flex flex-wrap md:flex-wrap gap-1.5 overflow-x-auto md:overflow-visible pb-2 md:pb-0 -mx-2 md:mx-0 px-2 md:px-0 snap-x hide-scrollbar">
+                         {tool.options.map((option) => (
+                            <div key={option} className="snap-start shrink-0 md:shrink">
+                              <button
+                                 onClick={() => toggleRefinement(option)}
+                                 disabled={isRefining}
+                                 className={`
+                                   text-left text-xs px-2.5 py-1.5 rounded-lg border transition-all whitespace-nowrap
+                                   ${refinementText.includes(option)
+                                     ? 'bg-primary-100 dark:bg-primary-900/30 border-primary-500 text-primary-700 dark:text-primary-300'
+                                     : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-primary-400 dark:hover:border-primary-500 hover:text-primary-700 dark:hover:text-primary-300'}
+                                 `}
+                              >
+                                 {option}
+                              </button>
+                            </div>
+                         ))}
+                       </div>
                   </div>
                ))}
             </div>
@@ -240,3 +239,39 @@ export const StepResult: React.FC<StepResultProps> = ({
     </div>
   );
 };
+
+const HistoryItem: React.FC<{
+  item: GeneratedImage;
+  isSelected: boolean;
+  onSelect: (item: GeneratedImage) => void;
+  onDelete: (id: string, e: React.MouseEvent) => void;
+}> = ({ item, isSelected, onSelect, onDelete }) => (
+  <button
+      onClick={() => onSelect(item)}
+      className={`
+          w-full text-left rounded-xl overflow-hidden border transition-all relative group shadow-sm
+          ${isSelected 
+              ? 'border-primary-500 ring-2 ring-primary-500/20 bg-primary-50/50 dark:bg-primary-900/10' 
+              : 'border-gray-200 dark:border-gray-800 hover:border-primary-300 dark:hover:border-primary-700 bg-white dark:bg-gray-800'}
+      `}
+  >
+      <div className="flex gap-2 p-1.5">
+          <img src={item.url} alt="Thumbnail" className="w-12 h-12 object-cover rounded-lg bg-gray-100" />
+          <div className="flex-1 min-w-0 flex flex-col justify-center">
+              <div className="text-xs font-semibold text-gray-900 dark:text-white truncate leading-tight">
+                  <MarkdownText text={item.title?.split(' ').slice(0, 2).join(' ') || item.prompt.split('-')[0].split(' ').slice(0, 2).join(' ') || "Custom Look"} />
+              </div>
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                  {new Date(item.timestamp).toLocaleDateString([], {month: 'short', day: 'numeric'})} • {new Date(item.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+              </p>
+          </div>
+          <button
+            onClick={(e) => onDelete(item.id, e)}
+            className="absolute top-2 right-2 p-1.5 bg-black/50 hover:bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+            title="Delete Image"
+          >
+            <X size={12} />
+          </button>
+      </div>
+  </button>
+);

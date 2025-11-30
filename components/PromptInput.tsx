@@ -16,6 +16,7 @@ interface PromptInputProps {
   enableSurpriseMe?: boolean;
   onSurpriseMe?: () => void;
   submitLabel?: string;
+  inputClassName?: string;
 }
 
 const getYoutubeMeta = (url: string) => {
@@ -39,7 +40,8 @@ export const PromptInput: React.FC<PromptInputProps> = ({
   label,
   enableSurpriseMe = false,
   onSurpriseMe,
-  submitLabel = "Generate"
+  submitLabel = "Generate",
+  inputClassName = "min-h-[80px]"
 }) => {
   const [isLinkInputOpen, setIsLinkInputOpen] = useState(false);
   const [tempLink, setTempLink] = useState('');
@@ -108,7 +110,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          className="w-full px-4 pt-4 pb-2 bg-transparent border-none focus:ring-0 text-gray-900 dark:text-white placeholder-gray-400 font-medium resize-none min-h-[80px]"
+          className={`w-full px-4 pt-4 pb-2 bg-transparent border-none focus:ring-0 text-gray-900 dark:text-white placeholder-gray-400 font-medium resize-none ${inputClassName}`}
           disabled={isGenerating}
         />
 
