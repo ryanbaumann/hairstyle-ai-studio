@@ -182,9 +182,9 @@ export const generateHairstyleImage = async (
       1. Left Panel: Front View
       2. Center Panel: Side View (Profile)
       3. Right Panel: Back View
-    - Maintain the Subject's facial identity and features exactly.
+    - Maintain the Subject's facial identity, features, and expression EXACTLY as in the original images. Do not alter the face.
     - Only change the hair. Keep lighting and background professional and clean (studio style).
-    - If side or back views were not provided for the subject, infer them realistically.
+    - If side or back views were not provided for the subject, infer them realistically while keeping the face consistent with the front view.
   `;
 
   parts.push({ text: promptText });
@@ -259,7 +259,7 @@ export const refineHairstyleImage = async (
     1. MODIFY ONLY the hair of the subject in the first image according to the instruction. 
     ${styleReferenceImage ? '2. USE the style/texture/color from the second image as the source of truth for the change.' : ''}
     3. STRICTLY MAINTAIN the 1x3 matrix layout. Do not merge the panels.
-    4. PRESERVE the person's identity, face, and the background exactly.
+    4. PRESERVE the person's identity, face, and expression exactly. Do not alter facial features.
     5. If the instruction is about length, color, or style, apply it consistently across all 3 views.
   `;
 

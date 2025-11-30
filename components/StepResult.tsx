@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { RotateCcw, Download, History, Calendar, Star, Loader2, Edit3, Scissors, Palette, Ruler, Layers } from 'lucide-react';
+import { RotateCcw, Download, History, Calendar, Star, Loader2, Edit3, Scissors, Palette, Ruler, Layers, X } from 'lucide-react';
 import { GeneratedImage } from '../types';
 import { PromptInput } from './PromptInput';
 import { MarkdownText } from './MarkdownText';
