@@ -13,7 +13,7 @@ interface StepUploadProps {
   onJumpToResult: (result: GeneratedImage) => void;
 }
 
-const PREVIEW_IMAGE_DATA = "/images/optimized/sample-hairstyle.jpg";
+const PREVIEW_IMAGE_DATA = "images/optimized/sample-hairstyle.jpg";
 
 export const StepUpload: React.FC<StepUploadProps> = ({ images, history, onUpload, onClear, onNext, onJumpToResult }) => {
   return (
