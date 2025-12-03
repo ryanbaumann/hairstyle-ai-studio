@@ -12,13 +12,13 @@
 ## 📸 Screenshots
 
 ### Application Interface
-![Hairstyle AI Studio UI](https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/ui-screenshot.jpg)
+![Hairstyle AI Studio UI](public/images/optimized/ui-screenshot.jpg)
 
 ### Sample Hairstyles
 <div align="center">
-  <img src="https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/wolf-cut-balayage-woman.jpg" width="30%" alt="Wolf Cut" />
-  <img src="https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/modern-mullet-man.jpg" width="30%" alt="Modern Mullet" />
-  <img src="https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/sleek-glass-bob-woman.jpg" width="30%" alt="Glass Bob" />
+  <img src="public/images/optimized/wolf-cut-balayage-woman.jpg" width="30%" alt="Wolf Cut" />
+  <img src="public/images/optimized/modern-mullet-man.jpg" width="30%" alt="Modern Mullet" />
+  <img src="public/images/optimized/sleek-glass-bob-woman.jpg" width="30%" alt="Glass Bob" />
 </div>
 
 ## 🛠️ Tech Stack

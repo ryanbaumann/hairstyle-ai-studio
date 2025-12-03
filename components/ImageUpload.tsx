@@ -139,8 +139,10 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ view, image, onUpload,
       </div>
 
       <div className={`
-          relative overflow-hidden rounded-2xl border-2 transition-all duration-300 h-80 shadow-sm
-          ${image || isCameraOpen ? 'border-primary-500 bg-black shadow-primary-500/20' : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800/50 border-dashed hover:border-primary-300 dark:hover:border-primary-700 hover:bg-gray-50 dark:hover:bg-gray-800'}
+          relative overflow-hidden rounded-2xl border-2 transition-all duration-300 aspect-[3/4] w-full shadow-sm group
+          ${image || isCameraOpen 
+            ? 'border-primary-500 bg-black shadow-primary-500/20 border-solid' 
+            : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800/50 border-dashed hover:border-primary-300 dark:hover:border-primary-700 hover:bg-gray-50 dark:hover:bg-gray-800'}
         `}>
         
         {/* State 1: Image Display */}
@@ -202,31 +204,31 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ view, image, onUpload,
 
         {/* State 3: Empty / Selection Mode */}
         {!image && !isCameraOpen && (
-          <div className="flex flex-col items-center justify-center h-full gap-6 p-6">
-             <div className="flex items-center justify-center w-16 h-16 rounded-full bg-gray-50 dark:bg-gray-900 text-gray-400">
-               {view === 'front' ? <Camera size={32} /> : <ImageIcon size={32} />}
+          <div className="flex flex-col items-center justify-center h-full gap-3 p-4">
+             <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gray-50 dark:bg-gray-900 text-gray-400">
+               {view === 'front' ? <Camera size={24} /> : <ImageIcon size={24} />}
              </div>
              
-             <div className="text-center space-y-1">
-                <p className="font-semibold text-gray-900 dark:text-white">Add {view} Photo</p>
-                <p className="text-xs text-gray-400">JPG or PNG</p>
+             <div className="text-center space-y-0.5 mb-1">
+                <p className="font-semibold text-gray-900 dark:text-white text-sm">Add {view} Photo</p>
+                <p className="text-[10px] text-gray-400">JPG or PNG</p>
              </div>
              
              {/* Updated button grid: tighter gap, reduced padding */}
              <div className="grid grid-cols-2 gap-2 w-full">
                <button
                  onClick={() => setIsCameraOpen(true)}
-                 className="flex items-center justify-center gap-2 px-3 py-3 rounded-xl bg-primary-50 dark:bg-primary-900/10 hover:bg-primary-100 dark:hover:bg-primary-900/30 text-primary-700 dark:text-primary-300 transition-colors font-semibold text-sm"
+                 className="flex items-center justify-center gap-1.5 px-2 py-2.5 rounded-xl bg-primary-50 dark:bg-primary-900/10 hover:bg-primary-100 dark:hover:bg-primary-900/30 text-primary-700 dark:text-primary-300 transition-colors font-semibold text-xs"
                >
-                  <Camera size={18} />
+                  <Camera size={14} />
                   Camera
                </button>
                
                <button
                  onClick={() => inputRef.current?.click()}
-                 className="flex items-center justify-center gap-2 px-3 py-3 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 transition-colors font-semibold text-sm"
+                 className="flex items-center justify-center gap-1.5 px-2 py-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 transition-colors font-semibold text-xs"
                >
-                  <Upload size={18} />
+                  <Upload size={14} />
                   Upload
                </button>
              </div>

@@ -35,19 +35,19 @@ export const STYLES = [
         id: 'wolf-cut',
         label: 'Wolf Cut',
         desc: 'Textured layers with balayage highlights',
-        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/wolf-cut-balayage-woman.jpg'
+        img: '/images/optimized/wolf-cut-balayage-woman.jpg'
       },
       {
         id: 'copper-shag',
         label: 'Copper Shag',
         desc: 'Textured copper shag hairstyle',
-        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/copper-shag-woman.jpg'
+        img: '/images/optimized/copper-shag-woman.jpg'
       },
       {
         id: 'glass-bob',
         label: 'Glass Bob',
         desc: 'Sleek, espresso glass-hair bob',
-        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/sleek-glass-bob-woman.jpg'
+        img: '/images/optimized/sleek-glass-bob-woman.jpg'
       },
     ]
   },
@@ -58,19 +58,19 @@ export const STYLES = [
         id: 'modern-mullet',
         label: 'Modern Mullet',
         desc: 'Textured back, shorter sides, contemporary fade',
-        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/modern-mullet-man.jpg'
+        img: '/images/optimized/modern-mullet-man.jpg'
       },
       {
         id: 'textured-crop',
         label: 'Textured Crop',
         desc: 'Skin fade with choppy, matte textured top',
-        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/textured-crop-man.jpg'
+        img: '/images/optimized/textured-crop-man.jpg'
       },
       {
         id: 'the-flow',
         label: 'The Flow',
         desc: 'Medium length, pushed back, natural waves',
-        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/long-flow-man.jpg'
+        img: '/images/optimized/long-flow-man.jpg'
       },
     ]
   }
