@@ -1,10 +1,12 @@
 
-import React, { useState } from 'react';
-import { RotateCcw, Download, History, Calendar, Star, Loader2, Edit3, Scissors, Palette, Ruler, Layers, X } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { RotateCcw, Download, History, Calendar, Edit3 } from 'lucide-react';
 import { GeneratedImage } from '../types';
 import { PromptInput } from './PromptInput';
 import { MarkdownText } from './MarkdownText';
 import { LoadingSpinner } from './LoadingSpinner';
+import { HistoryItem } from './HistoryItem';
+import { RefinementTools, REFINEMENT_TOOLS } from './RefinementTools';
 
 interface StepResultProps {
   result: GeneratedImage;
@@ -16,33 +18,6 @@ interface StepResultProps {
   onCtaClick: (type: 'book' | 'pro') => void;
   onDeleteHistoryItem: (id: string, e: React.MouseEvent) => void;
 }
-
-const REFINEMENT_TOOLS = [
-  { 
-    id: 'length', 
-    label: 'Length', 
-    icon: Ruler,
-    options: ['Trim ends', 'Shoulder length', 'Chin length', 'Short pixie', 'Long extensions'] 
-  },
-  { 
-    id: 'color', 
-    label: 'Color', 
-    icon: Palette,
-    options: ['Lighter', 'Darker', 'Warmer tone', 'Cooler tone', 'Add highlights', 'Root shadow'] 
-  },
-  { 
-    id: 'texture', 
-    label: 'Texture', 
-    icon: Layers,
-    options: ['More volume', 'Less volume', 'Smoother', 'Messier', 'Defined curls'] 
-  },
-  {
-    id: 'cut',
-    label: 'Cut Details',
-    icon: Scissors,
-    options: ['Add bangs', 'Curtain bangs', 'Face framing', 'Blunt cut', 'Razored edges']
-  }
-];
 
 export const StepResult: React.FC<StepResultProps> = ({ 
   result, 
@@ -57,7 +32,6 @@ export const StepResult: React.FC<StepResultProps> = ({
   const [refinementText, setRefinementText] = useState('');
   const [refImage, setRefImage] = useState<string | null>(null);
   const [refUrl, setRefUrl] = useState<string | null>(null);
-  const [selectedRefinements, setSelectedRefinements] = useState<string[]>([]);
 
   const handleDownload = () => {
     const link = document.createElement('a');
@@ -69,26 +43,39 @@ export const StepResult: React.FC<StepResultProps> = ({
   };
 
   const submitRefinement = () => {
-    const combinedText = [refinementText, ...selectedRefinements].filter(Boolean).join(', ');
-    if ((!combinedText.trim() && !refImage && !refUrl) || isRefining) return;
-    onRefine(combinedText, refImage, refUrl);
+    if ((!refinementText.trim() && !refImage && !refUrl) || isRefining) return;
+    onRefine(refinementText, refImage, refUrl);
     setRefinementText('');
     setRefImage(null);
     setRefUrl(null);
-    setSelectedRefinements([]);
   };
 
   const toggleRefinement = (option: string) => {
     setRefinementText(prev => {
-      if (prev.includes(option)) {
-        // Remove option and clean up commas
-        return prev.replace(new RegExp(`,?\\s*${option}`), '').replace(/^,\s*/, '');
+      const lowerPrev = prev.toLowerCase();
+      const lowerOption = option.toLowerCase();
+      
+      if (lowerPrev.includes(lowerOption)) {
+        // Remove option
+        const regex = new RegExp(`(^|,\\s*)${option}(,\\s*|$)`, 'i');
+        let newVal = prev.replace(regex, (match, p1, p2) => {
+           if (p1 && p2) return ', '; 
+           return '';
+        }).trim();
+        return newVal.replace(/^,\s*/, '').replace(/,\s*$/, '').replace(/,\s*,/g, ',');
       } else {
         // Add option
         return prev ? `${prev}, ${option}` : option;
       }
     });
   };
+
+  // Derive selected refinements from text for visual feedback
+  const selectedRefinements = useMemo(() => {
+    const lowerText = refinementText.toLowerCase();
+    const allOptions = REFINEMENT_TOOLS.flatMap(tool => tool.options);
+    return allOptions.filter(opt => lowerText.includes(opt.toLowerCase()));
+  }, [refinementText]);
 
   return (
     <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fadeIn pb-12">
@@ -99,7 +86,7 @@ export const StepResult: React.FC<StepResultProps> = ({
             <History size={20} /> Your Collection
         </div>
         <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-            {history.map((item, idx) => (
+            {history.map((item) => (
                 <HistoryItem 
                   key={item.id}
                   item={item}
@@ -120,7 +107,7 @@ export const StepResult: React.FC<StepResultProps> = ({
               <History size={16} /> Your Collection
           </div>
           <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 snap-x custom-scrollbar">
-              {history.map((item, idx) => (
+              {history.map((item) => (
                   <div key={item.id} className="snap-start shrink-0 w-48">
                     <HistoryItem 
                       item={item}
@@ -165,7 +152,7 @@ export const StepResult: React.FC<StepResultProps> = ({
                 className="w-full h-auto rounded-xl"
             />
             
-            {/* Title Overlay (if desired, or just show it in sidebar) - Adding distinct title here */}
+            {/* Title Overlay */}
             <div className="absolute top-4 left-4 bg-black/40 backdrop-blur-md text-white px-3 py-1.5 rounded-lg text-sm border border-white/20">
                <MarkdownText text={result.title || "Generated Style"} className="font-medium" />
             </div>
@@ -203,75 +190,14 @@ export const StepResult: React.FC<StepResultProps> = ({
                 submitLabel="Update"
             />
             
-            {/* Categorized Refinement Tools */}
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-               {REFINEMENT_TOOLS.map((tool) => (
-                  <div key={tool.id} className="space-y-2">
-                     <div className="flex items-center gap-2 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">
-                        <tool.icon size={12} /> {tool.label}
-                     </div>
-                       <div className="flex flex-wrap md:flex-wrap gap-1.5 overflow-x-auto md:overflow-visible pb-2 md:pb-0 -mx-2 md:mx-0 px-2 md:px-0 snap-x hide-scrollbar">
-                         {tool.options.map((option) => (
-                            <div key={option} className="snap-start shrink-0 md:shrink">
-                              <button
-                                 onClick={() => toggleRefinement(option)}
-                                 disabled={isRefining}
-                                 className={`
-                                   text-left text-xs px-2.5 py-1.5 rounded-lg border transition-all whitespace-nowrap
-                                   ${refinementText.includes(option)
-                                     ? 'bg-primary-100 dark:bg-primary-900/30 border-primary-500 text-primary-700 dark:text-primary-300'
-                                     : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-primary-400 dark:hover:border-primary-500 hover:text-primary-700 dark:hover:text-primary-300'}
-                                 `}
-                              >
-                                 {option}
-                              </button>
-                            </div>
-                         ))}
-                       </div>
-                  </div>
-               ))}
-            </div>
+            <RefinementTools 
+              selectedOptions={selectedRefinements}
+              onToggle={toggleRefinement}
+              disabled={isRefining}
+            />
         </div>
-
-        {/* Pro Banner removed from here, moved to App.tsx footer */}
 
       </div>
     </div>
   );
 };
-
-const HistoryItem: React.FC<{
-  item: GeneratedImage;
-  isSelected: boolean;
-  onSelect: (item: GeneratedImage) => void;
-  onDelete: (id: string, e: React.MouseEvent) => void;
-}> = ({ item, isSelected, onSelect, onDelete }) => (
-  <button
-      onClick={() => onSelect(item)}
-      className={`
-          w-full text-left rounded-xl overflow-hidden border transition-all relative group shadow-sm
-          ${isSelected 
-              ? 'border-primary-500 ring-2 ring-primary-500/20 bg-primary-50/50 dark:bg-primary-900/10' 
-              : 'border-gray-200 dark:border-gray-800 hover:border-primary-300 dark:hover:border-primary-700 bg-white dark:bg-gray-800'}
-      `}
-  >
-      <div className="flex gap-2 p-1.5">
-          <img src={item.url} alt="Thumbnail" className="w-12 h-12 object-cover rounded-lg bg-gray-100" />
-          <div className="flex-1 min-w-0 flex flex-col justify-center">
-              <div className="text-xs font-semibold text-gray-900 dark:text-white truncate leading-tight">
-                  <MarkdownText text={item.title?.split(' ').slice(0, 2).join(' ') || item.prompt.split('-')[0].split(' ').slice(0, 2).join(' ') || "Custom Look"} />
-              </div>
-              <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
-                  {new Date(item.timestamp).toLocaleDateString([], {month: 'short', day: 'numeric'})} • {new Date(item.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-              </p>
-          </div>
-          <button
-            onClick={(e) => onDelete(item.id, e)}
-            className="absolute top-2 right-2 p-1.5 bg-black/50 hover:bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-            title="Delete Image"
-          >
-            <X size={12} />
-          </button>
-      </div>
-  </button>
-);

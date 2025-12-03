@@ -1,7 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-import { Wand2, Sparkles, Scissors, Edit3, Image as ImageIcon, Link as LinkIcon, X, Youtube, Plus, Palette, Ruler, Waves, LayoutGrid } from 'lucide-react';
+import { Wand2, Sparkles, Edit3, X, Plus } from 'lucide-react';
 import { PromptInput } from './PromptInput';
+import { PresetImage } from './PresetImage';
+import { STYLE_PRINCIPLES, STYLES, LUCKY_PROMPTS } from '../data/styleOptions';
 
 interface StepStyleProps {
   onSelect: (style: string) => void;
@@ -15,115 +17,6 @@ interface StepStyleProps {
   onNext: () => void;
   onBack: () => void;
 }
-
-const STYLE_PRINCIPLES = [
-  {
-    id: 'cut',
-    label: 'Cut & Shape',
-    icon: Scissors,
-    options: ['Pixie', 'Bob', 'Lob', 'Shag', 'Wolf Cut', 'Mullet', 'Layered', 'Blunt', 'Undercut', 'Fade']
-  },
-  {
-    id: 'color',
-    label: 'Color & Tone',
-    icon: Palette,
-    options: ['Platinum', 'Balayage', 'Money Piece', 'Copper', 'Espresso', 'Pastel', 'Neon', 'Silver', 'Ombre']
-  },
-  {
-    id: 'texture',
-    label: 'Texture & Finish',
-    icon: Waves,
-    options: ['Messy', 'Sleek', 'Wavy', 'Curly', 'Coily', 'Braided', 'Glass Hair', 'Voluminous']
-  },
-  {
-    id: 'aesthetic',
-    label: 'Aesthetic',
-    icon: Sparkles,
-    options: ['Y2K', 'Old Money', 'Clean Girl', 'Edgy', 'Soft Girl', 'Cyberpunk', 'Boho']
-  }
-];
-
-const STYLES = [
-  {
-    category: "Trending Women",
-    items: [
-      {
-        id: 'wolf-cut',
-        label: 'Wolf Cut',
-        desc: 'Textured layers with balayage highlights',
-        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/wolf-cut-balayage-woman.jpg'
-      },
-      {
-        id: 'copper-shag',
-        label: 'Copper Shag',
-        desc: 'Textured copper shag hairstyle',
-        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/copper-shag-woman.jpg'
-      },
-      {
-        id: 'glass-bob',
-        label: 'Glass Bob',
-        desc: 'Sleek, espresso glass-hair bob',
-        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/sleek-glass-bob-woman.jpg'
-      },
-    ]
-  },
-  {
-    category: "Trending Men",
-    items: [
-      {
-        id: 'modern-mullet',
-        label: 'Modern Mullet',
-        desc: 'Textured back, shorter sides, contemporary fade',
-        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/modern-mullet-man.jpg'
-      },
-      {
-        id: 'textured-crop',
-        label: 'Textured Crop',
-        desc: 'Skin fade with choppy, matte textured top',
-        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/textured-crop-man.jpg'
-      },
-      {
-        id: 'the-flow',
-        label: 'The Flow',
-        desc: 'Medium length, pushed back, natural waves',
-        img: 'https://storage.googleapis.com/vibecoding-assets/ai-hairstyle-nov25/optimized/long-flow-man.jpg'
-      },
-    ]
-  }
-];
-
-const LUCKY_PROMPTS = [
-  "A futuristic cyberpunk bob with neon blue streaks",
-  "Vintage 1950s hollywood glamour waves",
-  "A wild, textured wolf cut with silver tips",
-  "Braided crown with loose wisps framing the face"
-];
-
-const PresetImage = ({ src, alt }: { src: string, alt: string }) => {
-  const [error, setError] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-
-  if (error) {
-    return (
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 flex flex-col items-center justify-center text-primary-300 dark:text-gray-700">
-        <Scissors size={32} className="mb-2 opacity-50" />
-      </div>
-    );
-  }
-
-  return (
-    <>
-      {!loaded && <div className="absolute inset-0 bg-gray-200 dark:bg-gray-800 animate-pulse" />}
-      <img
-        src={src}
-        alt={alt}
-        className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 ${loaded ? 'opacity-100' : 'opacity-0'}`}
-        onLoad={() => setLoaded(true)}
-        onError={() => setError(true)}
-      />
-    </>
-  );
-};
 
 export const StepStyle: React.FC<StepStyleProps> = ({
   onSelect,
@@ -159,7 +52,6 @@ export const StepStyle: React.FC<StepStyleProps> = ({
     
     if (exists) {
       // Remove token if it exists (rudimentary removal)
-      // This is a bit tricky with comma separation, but let's try a simple replace
       const regex = new RegExp(`(^|,\\s*)${token}(,\\s*|$)`, 'i');
       newVal = newVal.replace(regex, (match, p1, p2) => {
         if (p1 && p2) return ', '; // Kept between two other tokens

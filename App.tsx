@@ -1,289 +1,39 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { ThemeToggle } from './components/ThemeToggle';
 import { StepUpload } from './components/StepUpload';
 import { StepStyle } from './components/StepStyle';
 import { StepResult } from './components/StepResult';
 import { MarketingModal } from './components/MarketingModal';
-import { generateHairstyleImage, refineHairstyleImage, generateTitleFromPrompt } from './services/geminiService';
-import { saveImage, getImage, clearAllImages } from './services/imageStorage';
-import { AppState, GeneratedImage, ViewType } from './types';
-import { Sparkles, Scissors, Loader2, ChevronRight, Check, Zap, Trash2, Star } from 'lucide-react';
-import { LoadingSpinner } from './components/LoadingSpinner';
-
-// Simplified, Faster Loading View (20s)
-const LoadingView = () => {
-  const [progress, setProgress] = useState(0);
-  const [messageIdx, setMessageIdx] = useState(0);
-
-  const MESSAGES = [
-    "Analyzing facial structure...",
-    "Mapping 3D features...",
-    "Generating hair volume...",
-    "Applying texture & color...",
-    "Optimizing lighting...",
-    "Finalizing your new look..."
-  ];
-
-  useEffect(() => {
-    const totalTime = 20000; // 20 seconds
-    const intervalTime = 100;
-    const steps = totalTime / intervalTime;
-
-    const timer = setInterval(() => {
-      setProgress(p => Math.min(p + (100 / steps), 100));
-    }, intervalTime);
-
-    const messageTimer = setInterval(() => {
-      setMessageIdx(prev => (prev + 1) % MESSAGES.length);
-    }, totalTime / MESSAGES.length);
-
-    return () => {
-      clearInterval(timer);
-      clearInterval(messageTimer);
-    };
-  }, []);
-
-  return (
-    <div className="max-w-xl mx-auto text-center py-32 animate-fadeIn select-none">
-      <LoadingSpinner 
-        progress={progress}
-        message={MESSAGES[messageIdx]}
-        subMessage={progress < 100 ? "This usually takes about 20 seconds." : "Almost there! Still working..."}
-        size="lg"
-      />
-    </div>
-  );
-};
+import { LoadingView } from './components/LoadingView';
+import { useAppFlow } from './hooks/useAppFlow';
+import { Sparkles, ChevronRight, Check, Trash2, Star } from 'lucide-react';
 
 export const App = () => {
-  const [hasKey, setHasKey] = useState(false);
-  const [state, setState] = useState<AppState>({
-    step: 'upload',
-    images: { front: null, side: null, back: null },
-    selectedStyle: '',
-    customPrompt: '',
-    styleReferenceImage: null,
-    styleReferenceUrl: null,
-    generatedResult: null,
-    history: [],
-    theme: 'light',
-    isMarketingModalOpen: false,
-  });
+  const {
+    state,
+    setState,
+    hasKey,
+    handleSelectKey,
+    updateImages,
+    clearImage,
+    handleGenerate,
+    handleRefine,
+    isRefining,
+    handleDeleteHistoryItem,
+    handleClearHistory,
+    navigateTo
+  } = useAppFlow();
 
-  const [isRefining, setIsRefining] = useState(false);
-
-  // Persistence Logic
-  useEffect(() => {
-    const loadHistory = async () => {
-      try {
-        const saved = localStorage.getItem('hairstyle_history');
-        if (saved) {
-          const parsed: GeneratedImage[] = JSON.parse(saved);
-          // Hydrate images from IndexedDB
-          const hydratedHistory = await Promise.all(parsed.map(async (item) => {
-            if (!item.url.startsWith('data:')) {
-              const savedImage = await getImage(item.id);
-              if (savedImage) {
-                return { ...item, url: savedImage };
-              }
-            }
-            return item;
-          }));
-          setState(prev => ({ ...prev, history: hydratedHistory }));
-        }
-      } catch (e) {
-        console.error("Failed to load history", e);
-      }
-    };
-    loadHistory();
-  }, []);
-
-  useEffect(() => {
-    if (state.history.length > 0) {
-      // Save metadata to localStorage, but keep base64 out of it if possible
-      // Actually, we can store the ID and a placeholder, and store the real image in IndexedDB
-      const metadataOnly = state.history.map(item => ({
-        ...item,
-        url: item.id // Use ID as placeholder or keep it if it's already a URL. 
-                     // Since we hydrate on load, this is fine.
-      }));
-      localStorage.setItem('hairstyle_history', JSON.stringify(metadataOnly));
-    }
-  }, [state.history]);
-
-  useEffect(() => {
-    const checkApiKey = async () => {
-      if (window.aistudio) {
-        const has = await window.aistudio.hasSelectedApiKey();
-        setHasKey(has);
-      } else {
-        setHasKey(!!import.meta.env.VITE_GEMINI_API_KEY);
-      }
-    };
-    checkApiKey();
-  }, []);
-
-  const handleSelectKey = async () => {
-    if (window.aistudio) {
-      await window.aistudio.openSelectKey();
-      setHasKey(true);
-    }
-  };
-
-  const updateImages = (view: ViewType, base64: string) => {
-    setState(prev => ({
-      ...prev,
-      images: { ...prev.images, [view]: base64 }
-    }));
-  };
-
-  const clearImage = (view: ViewType) => {
-    setState(prev => ({
-      ...prev,
-      images: { ...prev.images, [view]: null }
-    }));
-  };
-
-  const handleGenerate = async () => {
-    if (!state.images.front) return;
-    setState(prev => ({ ...prev, step: 'generating' }));
-
-    const promptToUse = state.selectedStyle || state.customPrompt;
-
-    try {
-      // Run generation and title summarization in parallel for better performance
-      const [imageUrl, title] = await Promise.all([
-        generateHairstyleImage(
-          state.images,
-          promptToUse,
-          state.styleReferenceImage,
-          state.styleReferenceUrl
-        ),
-        generateTitleFromPrompt(promptToUse)
-      ]);
-
-      const newResult: GeneratedImage = {
-        id: Date.now().toString(),
-        url: imageUrl,
-        prompt: promptToUse,
-        title: title,
-        timestamp: Date.now()
-      };
-
-      // Save to IndexedDB
-      await saveImage(newResult.id, imageUrl);
-
-      setState(prev => ({
-        ...prev,
-        step: 'result',
-        generatedResult: newResult,
-        history: [newResult, ...prev.history]
-      }));
-    } catch (error) {
-      console.error(error);
-      alert("Failed to generate hairstyle. Please try again.");
-      setState(prev => ({ ...prev, step: 'style' }));
-    }
-  };
-
-  const handleRefine = async (instruction: string, refImage: string | null = null, refUrl: string | null = null) => {
-    if (!state.generatedResult) return;
-    setIsRefining(true);
-    try {
-      const [imageUrl, title] = await Promise.all([
-        refineHairstyleImage(
-          state.generatedResult.url,
-          instruction,
-          refImage,
-          refUrl
-        ),
-        generateTitleFromPrompt(instruction)
-      ]);
-
-      const newResult: GeneratedImage = {
-        id: Date.now().toString(),
-        url: imageUrl,
-        prompt: instruction,
-        title: title,
-        timestamp: Date.now()
-      };
-
-      // Save to IndexedDB
-      await saveImage(newResult.id, imageUrl);
-
-      setState(prev => ({
-        ...prev,
-        generatedResult: newResult,
-        history: [newResult, ...prev.history]
-      }));
-    } catch (error) {
-      console.error(error);
-      alert("Failed to refine image.");
-    } finally {
-      setIsRefining(false);
-    }
-  };
-
-  const handleHistorySelect = (item: GeneratedImage) => {
-    setState(prev => ({ ...prev, generatedResult: item }));
-  };
-
-  const handleDeleteHistoryItem = async (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (confirm("Are you sure you want to delete this image?")) {
-      const { deleteImage } = await import('./services/imageStorage');
-      await deleteImage(id);
-      setState(prev => {
-        const newHistory = prev.history.filter(item => item.id !== id);
-        let newGeneratedResult = prev.generatedResult;
-        if (prev.generatedResult?.id === id) {
-          newGeneratedResult = newHistory.length > 0 ? newHistory[0] : null;
-        }
-        return {
-          ...prev,
-          history: newHistory,
-          generatedResult: newGeneratedResult,
-          step: newHistory.length > 0 ? prev.step : 'upload'
-        };
-      });
-    }
-  };
-
-  const handleClearHistory = async () => {
-    if (confirm("Are you sure you want to clear your history? This cannot be undone.")) {
-      await clearAllImages();
-      localStorage.removeItem('hairstyle_history');
-      setState(prev => ({ ...prev, history: [], generatedResult: null, step: 'upload' }));
-    }
-  };
-
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [state.step]);
-
-  // Navigation Logic
+  // Navigation Logic Helpers
   const canGoToUpload = true;
   const canGoToStyle = state.step === 'style' || state.step === 'result' || state.step === 'generating';
   const canGoToResult = state.step === 'result';
-
-  const navigateTo = (target: 'upload' | 'style' | 'result') => {
-    if (state.step === 'generating') return; // Lock during generation
-
-    if (target === 'upload' && canGoToUpload) {
-      setState(prev => ({ ...prev, step: 'upload' }));
-    } else if (target === 'style' && canGoToStyle) {
-      setState(prev => ({ ...prev, step: 'style' }));
-    } else if (target === 'result' && canGoToResult) {
-      setState(prev => ({ ...prev, step: 'result' }));
-    }
-  };
 
   if (!hasKey) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col items-center justify-center p-4 text-center">
         <div className="max-w-md w-full bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800">
-          {/* ... existing key prompt ... */}
           <div className="w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
             <Sparkles className="text-primary-600 dark:text-primary-400" size={32} />
           </div>
@@ -397,7 +147,7 @@ export const App = () => {
           <StepResult
             result={state.generatedResult}
             history={state.history}
-            onHistorySelect={handleHistorySelect}
+            onHistorySelect={(item) => setState(prev => ({ ...prev, generatedResult: item }))}
             onRestart={() => setState(prev => ({ ...prev, step: 'upload' }))}
             onRefine={handleRefine}
             isRefining={isRefining}
