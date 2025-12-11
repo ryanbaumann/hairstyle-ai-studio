@@ -206,8 +206,8 @@ export const useAppFlow = () => {
     if (state.step === 'generating') return;
 
     const canGoToUpload = true;
-    const canGoToStyle = state.step === 'style' || state.step === 'result' || state.step === 'generating';
-    const canGoToResult = state.step === 'result';
+    const canGoToStyle = !!state.images.front || state.history.length > 0;
+    const canGoToResult = !!state.generatedResult;
 
     if (target === 'upload' && canGoToUpload) {
       setState(prev => ({ ...prev, step: 'upload' }));

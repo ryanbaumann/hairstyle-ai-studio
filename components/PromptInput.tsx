@@ -213,13 +213,14 @@ export const PromptInput: React.FC<PromptInputProps> = ({
                     onClick={onSubmit}
                     disabled={(!value && !image && !url) || isGenerating}
                     className={`
-                        flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide transition-all shadow-sm
+                        flex items-center gap-2 px-6 py-2 rounded-xl text-sm font-black uppercase tracking-widest transition-all shadow-lg
                         ${value || image || url 
-                            ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-primary-500/20' 
+                            ? 'bg-gradient-to-r from-primary-600 to-indigo-600 text-white hover:from-primary-500 hover:to-indigo-500 shadow-primary-500/30 hover:shadow-primary-500/50 hover:-translate-y-0.5 active:translate-y-0 active:scale-95' 
                             : 'bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed'}
+                        ${(value || image || url) && !isGenerating ? 'animate-pulse ring-2 ring-primary-500/20' : ''}
                     `}
                 >
-                    {isGenerating ? <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full" /> : <Wand2 size={14} />}
+                    {isGenerating ? <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full" /> : <Wand2 size={16} />}
                     {submitLabel}
                 </button>
             )}

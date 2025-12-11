@@ -11,28 +11,35 @@
       darkMode: 'class',
       theme: {
         extend: {
-          colors: {
-            primary: {
-              50: '#f5f3ff',
-              100: '#ede9fe',
-              200: '#ddd6fe',
-              300: '#c4b5fd',
-              400: '#a78bfa',
-              500: '#8b5cf6',
-              600: '#7c3aed',
-              700: '#6d28d9',
-              800: '#5b21b6',
-              900: '#4c1d95',
-            },
-          },
           fontFamily: {
-            sans: ['Inter', 'sans-serif'],
+            display: ["Inter", "sans-serif"],
+            sans: ["Inter", "sans-serif"],
+          },
+          colors: {
+            primary: "#7C3AED", // Violet-600
+            "primary-light": "#8B5CF6", // Violet-500
+            "primary-dark": "#6D28D9", // Violet-700
+            "background-light": "#F8FAFC", // Slate-50
+            "background-dark": "#0F172A", // Slate-900
+            "card-light": "#FFFFFF",
+            "card-dark": "#1E293B", // Slate-800
+          },
+          borderRadius: {
+            DEFAULT: "0.75rem", // 12px
+            'xl': '1rem', // 16px
+            '2xl': '1.5rem', // 24px
+            '3xl': '2rem', // 32px
+          },
+          boxShadow: {
+            'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+            'glow': '0 0 20px rgba(124, 58, 237, 0.3)',
           }
         },
       },
     }
   </script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   <style>
     body {
       font-family: 'Inter', sans-serif;
@@ -59,6 +66,22 @@
 
     ::-webkit-scrollbar-thumb:hover {
       background: #94a3b8;
+    }
+
+    .text-gradient {
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-image: linear-gradient(90deg, #7C3AED, #4F46E5);
+    }
+
+    .dotted-border {
+      background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='12' ry='12' stroke='%23CBD5E1FF' stroke-width='2' stroke-dasharray='6%2c 14' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+      border-radius: 0.75rem;
+    }
+
+    .dark .dotted-border {
+         background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='12' ry='12' stroke='%23475569FF' stroke-width='2' stroke-dasharray='6%2c 14' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
     }
   </style>
   <script type="importmap">

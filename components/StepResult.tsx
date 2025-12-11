@@ -121,7 +121,7 @@ export const StepResult: React.FC<StepResultProps> = ({
         </div>
 
         {/* Top Actions */}
-        <div className="flex flex-wrap gap-4 justify-between items-center bg-white dark:bg-gray-900 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800">
+        <div className="flex flex-wrap gap-4 justify-between items-center bg-card-light dark:bg-card-dark p-6 rounded-3xl shadow-soft border border-gray-100 dark:border-gray-800">
             <button
                 onClick={onRestart}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors font-medium"
@@ -131,13 +131,13 @@ export const StepResult: React.FC<StepResultProps> = ({
             <div className="flex gap-3">
                 <button
                     onClick={() => onCtaClick('book')}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-semibold hover:opacity-90 transition-opacity"
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold hover:shadow-lg hover:-translate-y-0.5 transition-all"
                 >
                     <Calendar size={18} /> <span className="hidden sm:inline">Book Stylist</span>
                 </button>
                 <button
                     onClick={handleDownload}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary-600 hover:bg-primary-700 text-white font-medium shadow-lg shadow-primary-500/20 transition-all"
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary-600 to-indigo-600 text-white font-bold shadow-glow hover:shadow-lg hover:-translate-y-0.5 transition-all"
                 >
                     <Download size={18} /> Save Image
                 </button>
@@ -145,11 +145,11 @@ export const StepResult: React.FC<StepResultProps> = ({
         </div>
 
         {/* Main Image */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl p-2 shadow-2xl shadow-black/10 dark:shadow-black/50 border border-gray-200 dark:border-gray-800 relative overflow-hidden">
+        <div className="bg-card-light dark:bg-card-dark rounded-3xl p-3 shadow-2xl shadow-black/10 dark:shadow-black/50 border border-gray-100 dark:border-gray-800 relative overflow-hidden group">
             <img 
                 src={result.url} 
                 alt="New Hairstyle Result" 
-                className="w-full h-auto rounded-xl"
+                className="w-full h-auto rounded-2xl"
             />
             
             {/* Title Overlay */}

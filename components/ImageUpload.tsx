@@ -34,6 +34,10 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ view, image, onUpload,
 
     const startCamera = async () => {
       try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+           throw new Error("Camera API not available. Please ensure you are using HTTPS or localhost.");
+        }
+
         const stream = await navigator.mediaDevices.getUserMedia({ 
           video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
           audio: false 
@@ -50,10 +54,10 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ view, image, onUpload,
           // Clean up if component unmounted or mode changed during load
           stream.getTracks().forEach(track => track.stop());
         }
-      } catch (err) {
-        console.error("Camera access error:", err);
+      } catch (err: any) {
+        console.warn("Camera access warning:", err); // Warn instead of Error to avoid frightening the user
         if (mounted) {
-          setCameraError("Could not access camera. Please check permissions.");
+          setCameraError(err.message || "Could not access camera. Please check permissions.");
         }
       }
     };
@@ -139,10 +143,10 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ view, image, onUpload,
       </div>
 
       <div className={`
-          relative overflow-hidden rounded-2xl border-2 transition-all duration-300 aspect-[3/4] w-full shadow-sm group
+          relative overflow-hidden transition-all duration-300 aspect-[3/4] w-full
           ${image || isCameraOpen 
-            ? 'border-primary-500 bg-black shadow-primary-500/20 border-solid' 
-            : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800/50 border-dashed hover:border-primary-300 dark:hover:border-primary-700 hover:bg-gray-50 dark:hover:bg-gray-800'}
+            ? 'rounded-2xl border-2 border-primary-500 bg-black shadow-primary-500/20 shadow-lg' 
+            : 'dotted-border hover:bg-slate-50 dark:hover:bg-slate-800/50'}
         `}>
         
         {/* State 1: Image Display */}
@@ -204,31 +208,27 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ view, image, onUpload,
 
         {/* State 3: Empty / Selection Mode */}
         {!image && !isCameraOpen && (
-          <div className="flex flex-col items-center justify-center h-full gap-3 p-4">
-             <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gray-50 dark:bg-gray-900 text-gray-400">
-               {view === 'front' ? <Camera size={24} /> : <ImageIcon size={24} />}
+          <div className="flex flex-col items-center justify-center h-full p-4 group cursor-pointer">
+             <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+               <span className="material-icons text-slate-400">{view === 'front' ? 'photo_camera' : 'image'}</span>
              </div>
              
-             <div className="text-center space-y-0.5 mb-1">
-                <p className="font-semibold text-gray-900 dark:text-white text-sm">Add {view} Photo</p>
-                <p className="text-[10px] text-gray-400">JPG or PNG</p>
-             </div>
+             <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 text-center">Add {view} Photo</p>
+             <p className="text-xs text-slate-400 text-center mb-4">JPG or PNG</p>
              
-             {/* Updated button grid: tighter gap, reduced padding */}
-             <div className="grid grid-cols-2 gap-2 w-full">
+             {/* Updated button grid: tighter gap, reduced padding - mimicking reference */}
+             <div className="flex gap-2 w-full justify-center opacity-80 group-hover:opacity-100 transition-opacity">
                <button
-                 onClick={() => setIsCameraOpen(true)}
-                 className="flex items-center justify-center gap-1.5 px-2 py-2.5 rounded-xl bg-primary-50 dark:bg-primary-900/10 hover:bg-primary-100 dark:hover:bg-primary-900/30 text-primary-700 dark:text-primary-300 transition-colors font-semibold text-xs"
+                 onClick={(e) => { e.stopPropagation(); setIsCameraOpen(true); }}
+                 className="px-3 py-1.5 text-xs font-medium bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 rounded hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors w-1/2 text-center"
                >
-                  <Camera size={14} />
                   Camera
                </button>
                
                <button
-                 onClick={() => inputRef.current?.click()}
-                 className="flex items-center justify-center gap-1.5 px-2 py-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 transition-colors font-semibold text-xs"
+                 onClick={(e) => { e.stopPropagation(); inputRef.current?.click(); }}
+                 className="px-3 py-1.5 text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors w-1/2 text-center"
                >
-                  <Upload size={14} />
                   Upload
                </button>
              </div>
