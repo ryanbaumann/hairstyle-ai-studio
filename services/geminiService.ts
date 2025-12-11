@@ -109,7 +109,8 @@ export const generateHairstyleImage = async (
   images: { front: string | null; side: string | null; back: string | null },
   styleDescription: string,
   styleReferenceImage: string | null = null,
-  styleReferenceUrl: string | null = null
+  styleReferenceUrl: string | null = null,
+  onThinking?: (thought: string) => void
 ): Promise<string> => {
   const ai = getAiClient();
   
@@ -190,7 +191,7 @@ export const generateHairstyleImage = async (
   parts.push({ text: promptText });
 
   try {
-    const response = await ai.models.generateContent({
+    const response = await ai.models.generateContentStream({
       model: 'gemini-3-pro-image-preview',
       contents: parts,
       config: {
@@ -198,13 +199,29 @@ export const generateHairstyleImage = async (
             aspectRatio: "16:9",
             imageSize: "1K"
         },
+        thinkingConfig: {
+            includeThoughts: true
+        }
       }
     });
 
-    for (const part of response.candidates?.[0]?.content?.parts || []) {
-      if (part.inlineData) {
-        return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-      }
+    let finalImageProp: any = null;
+
+    for await (const chunk of response) {
+        for (const part of chunk.candidates?.[0]?.content?.parts || []) {
+            if (part.thought && onThinking) {
+                // We got a thought chunk
+                onThinking(part.text || '');
+            }
+            if (part.inlineData) {
+                // We got the image data
+                finalImageProp = part.inlineData;
+            }
+        }
+    }
+
+    if (finalImageProp) {
+        return `data:${finalImageProp.mimeType};base64,${finalImageProp.data}`;
     }
     
     throw new Error("No image generated.");
@@ -218,7 +235,8 @@ export const refineHairstyleImage = async (
   currentImage: string,
   refinementInstruction: string,
   styleReferenceImage: string | null = null,
-  styleReferenceUrl: string | null = null
+  styleReferenceUrl: string | null = null,
+  onThinking?: (thought: string) => void
 ): Promise<string> => {
   const ai = getAiClient();
   
@@ -266,7 +284,7 @@ export const refineHairstyleImage = async (
   parts.push({ text: promptText });
 
   try {
-    const response = await ai.models.generateContent({
+    const response = await ai.models.generateContentStream({
       model: 'gemini-3-pro-image-preview',
       contents: parts,
       config: {
@@ -274,13 +292,27 @@ export const refineHairstyleImage = async (
             aspectRatio: "16:9",
             imageSize: "1K"
         },
+        thinkingConfig: {
+            includeThoughts: true
+        }
       }
     });
 
-    for (const part of response.candidates?.[0]?.content?.parts || []) {
-      if (part.inlineData) {
-        return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-      }
+    let finalImageProp: any = null;
+
+    for await (const chunk of response) {
+        for (const part of chunk.candidates?.[0]?.content?.parts || []) {
+            if (part.thought && onThinking) {
+                 onThinking(part.text || '');
+            }
+            if (part.inlineData) {
+                finalImageProp = part.inlineData;
+            }
+        }
+    }
+
+    if (finalImageProp) {
+        return `data:${finalImageProp.mimeType};base64,${finalImageProp.data}`;
     }
     
     throw new Error("No image generated.");

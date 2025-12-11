@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { AppState, GeneratedImage, ViewType } from '../types';
 import { generateHairstyleImage, refineHairstyleImage, generateTitleFromPrompt } from '../services/geminiService';
 import { saveImage, getImage, clearAllImages, deleteImage } from '../services/imageStorage';
@@ -19,6 +19,8 @@ export const useAppFlow = () => {
   });
 
   const [isRefining, setIsRefining] = useState(false);
+  const [refinementPrompt, setRefinementPrompt] = useState("");
+  const [currentThoughts, setCurrentThoughts] = useState("");
 
   // API Key Check
   useEffect(() => {
@@ -100,6 +102,7 @@ export const useAppFlow = () => {
   const handleGenerate = async () => {
     if (!state.images.front) return;
     setState(prev => ({ ...prev, step: 'generating' }));
+    setCurrentThoughts(""); // Clear previous thoughts
 
     const promptToUse = state.selectedStyle || state.customPrompt;
 
@@ -109,7 +112,8 @@ export const useAppFlow = () => {
           state.images,
           promptToUse,
           state.styleReferenceImage,
-          state.styleReferenceUrl
+          state.styleReferenceUrl,
+          (thought) => setCurrentThoughts(prev => prev + thought)
         ),
         generateTitleFromPrompt(promptToUse)
       ]);
@@ -140,13 +144,17 @@ export const useAppFlow = () => {
   const handleRefine = async (instruction: string, refImage: string | null = null, refUrl: string | null = null) => {
     if (!state.generatedResult) return;
     setIsRefining(true);
+    setRefinementPrompt(instruction);
+    setCurrentThoughts(""); // Clear thoughts
+
     try {
       const [imageUrl, title] = await Promise.all([
         refineHairstyleImage(
           state.generatedResult.url,
           instruction,
           refImage,
-          refUrl
+          refUrl,
+          (thought) => setCurrentThoughts(prev => prev + thought)
         ),
         generateTitleFromPrompt(instruction)
       ]);
@@ -230,6 +238,8 @@ export const useAppFlow = () => {
     isRefining,
     handleDeleteHistoryItem,
     handleClearHistory,
-    navigateTo
+    navigateTo,
+    currentThoughts,
+    refinementPrompt
   };
 };

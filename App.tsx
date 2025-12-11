@@ -22,7 +22,9 @@ export const App = () => {
     isRefining,
     handleDeleteHistoryItem,
     handleClearHistory,
-    navigateTo
+    navigateTo,
+    currentThoughts,
+    refinementPrompt
   } = useAppFlow();
 
   // Navigation Logic Helpers
@@ -125,7 +127,23 @@ export const App = () => {
           />
         )}
 
-        {state.step === 'generating' && <LoadingView />}
+        {(state.step === 'generating' || isRefining) && (
+          <div className="fixed inset-0 z-50 bg-background-light dark:bg-background-dark overflow-y-auto">
+             {/* Re-use Navbar for consistency or just fullscreen overlay? 
+                 The request implies "same loading experience".
+                 The original was inline. 
+                 If we want it to look EXACTLY the same, we should probably just render it in place of content or overlay.
+                 Let's do an overlay to cover the Result screen.
+             */}
+             <div className="min-h-screen p-4 flex flex-col">
+                <LoadingView 
+                  userImage={isRefining ? state.generatedResult?.url : state.images.front}
+                  prompt={isRefining ? refinementPrompt : (state.customPrompt || state.selectedStyle)}
+                  thoughts={currentThoughts}
+                />
+             </div>
+          </div>
+        )}
 
         {state.step === 'result' && state.generatedResult && (
           <StepResult
