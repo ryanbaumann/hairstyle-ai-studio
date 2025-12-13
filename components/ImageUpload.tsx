@@ -146,7 +146,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ view, image, onUpload,
           relative overflow-hidden transition-all duration-300 aspect-[3/4] w-full
           ${image || isCameraOpen 
             ? 'rounded-2xl border-2 border-primary-500 bg-black shadow-primary-500/20 shadow-lg' 
-            : 'dotted-border hover:bg-slate-50 dark:hover:bg-slate-800/50'}
+            : 'rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30 hover:border-primary-400 dark:hover:border-primary-500 hover:bg-white dark:hover:bg-slate-800'}
         `}>
         
         {/* State 1: Image Display */}

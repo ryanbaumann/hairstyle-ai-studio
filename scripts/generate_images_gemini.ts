@@ -7,44 +7,49 @@ import dotenv from "dotenv";
 // Load environment variables
 dotenv.config();
 
-const API_KEY = process.env.API_KEY;
+const API_KEY = process.env.VITE_GEMINI_API_KEY;
 if (!API_KEY) {
-  console.error("Error: API_KEY not found in .env file");
+  console.error("Error: VITE_GEMINI_API_KEY not found in .env file");
   process.exit(1);
 }
 
-const genAI = new GoogleGenAI(API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-002" }); // Using a stable model for text-to-image if available, or text-to-text if that's what we have. Wait, Gemini 1.5 doesn't do image generation directly in the same way as specialized models, but the user wants to use the SDK. If they want image generation, we should use the correct model if available, or stick to the tool if that's the only way. 
-// Actually, the user's service uses 'gemini-3-pro-image-preview'. Let's try to use that if possible, or fallback to a known working one.
-// Given the constraints, I will use the same model as in their service.
-
+const genAI = new GoogleGenAI({ apiKey: API_KEY });
 const IMAGE_MODEL = "gemini-3-pro-image-preview";
 
 async function generateImage(prompt: string, filename: string) {
   console.log(`Generating image for: ${prompt}`);
   try {
-    const model = genAI.getGenerativeModel({ model: IMAGE_MODEL });
-    
-    // Using the correct configuration for image generation if supported by the SDK version
-    const result = await model.generateContent({
+    // Correct API usage for @google/genai v0.2+
+    const result = await genAI.models.generateContent({
+      model: IMAGE_MODEL,
       contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: {
-        // @ts-ignore - Specific to image models
+      config: {
+        // @ts-ignore
         imageConfig: {
           aspectRatio: "4:3",
           imageSize: "1K"
         }
       }
     });
-    const response = await result.response;
+
+    // Handle response structure for new SDK
+    // The response object structure might differ, usually response.candidates[0].content.parts
+    // But let's check if the SDK returns a response object directly or if we need .response
     
-    // Check if we got an image back. The SDK might return it in parts.
+    // In geminiService.ts: const response = await ai.models.generateContent(...)
+    // Then checks response.text or stream.
+    
+    // Let's assume standard response structure
+    const candidates = result.candidates;
     let imageBase64 = null;
-    for (const part of response.candidates?.[0]?.content?.parts || []) {
-      if (part.inlineData) {
-        imageBase64 = part.inlineData.data;
-        break;
-      }
+    
+    if (candidates && candidates[0]?.content?.parts) {
+        for (const part of candidates[0].content.parts) {
+             if (part.inlineData) {
+                imageBase64 = part.inlineData.data;
+                break;
+             }
+        }
     }
 
     if (imageBase64) {
@@ -54,7 +59,6 @@ async function generateImage(prompt: string, filename: string) {
       console.log(`Successfully saved image to ${filepath}`);
     } else {
       console.error(`No image data received for ${prompt}`);
-      // Fallback: if we can't generate, at least we tried.
     }
   } catch (error) {
     console.error(`Error generating image for ${prompt}:`, error);
@@ -64,24 +68,20 @@ async function generateImage(prompt: string, filename: string) {
 async function main() {
   const imagesToGenerate = [
     {
-      prompt: "A high-quality, professional portrait of a woman with a sleek, glass-hair bob cut, deep espresso color. Photorealistic, studio lighting, fashion photography style.",
-      filename: "sleek-glass-bob-woman.png"
+      prompt: "A high-quality, professional portrait of a woman with a Mixie haircut (Pixie-Mullet hybrid). The style features short chic micro-bangs and choppy layers on top, transitioning into longer wispy layers at the nape of the neck. Dark brown hair with subtle texture. Photorealistic, studio lighting.",
+      filename: "mixie-cut-woman.png"
     },
     {
-      prompt: "A high-quality, professional portrait of a woman with a textured copper shag hairstyle. Photorealistic, studio lighting, fashion photography style.",
-      filename: "copper-shag-woman.png"
+      prompt: "A high-quality, professional portrait of a woman with a trendy Shag haircut featuring holographic silver and pastel lavender coloring. Medium length with heavy layering and face-framing curtain bangs. Voluminous, edgy, key lighting. Photorealistic.",
+      filename: "holographic-shag-woman.png"
     },
     {
-      prompt: "A high-quality, professional portrait of a man with a textured crop hairstyle and a skin fade. Photorealistic, studio lighting, fashion photography style.",
-      filename: "textured-crop-man.png"
+      prompt: "A high-quality, professional portrait of a man with a Modern Curly Fringe / Textured Crop. High skin fade on the sides, with a heavy pile of natural messy curls falling forward onto the forehead. Medium brown hair. Photorealistic, studio lighting.",
+      filename: "curly-fringe-man.png"
     },
     {
-      prompt: "A high-quality, professional portrait of a man with long, flowing natural waves. Photorealistic, studio lighting, fashion photography style.",
-      filename: "long-flow-man.png"
-    },
-    {
-      prompt: "A high-quality, professional portrait of a man with a modern, textured mullet hairstyle. Photorealistic, studio lighting, fashion photography style.",
-      filename: "modern-mullet-man.png"
+      prompt: "A high-quality, professional portrait of a man with a Soft Pompadour hairstyle. The hair is swept back with volume but has a matte, natural finish (not greasy). Short tapered scissor-cut sides. Dark blonde hair. Photorealistic, studio lighting.",
+      filename: "soft-pompadour-man.png"
     }
   ];
 

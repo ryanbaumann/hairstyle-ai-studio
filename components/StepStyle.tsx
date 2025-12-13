@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Wand2, Sparkles, Edit3, X, Plus, Check } from 'lucide-react';
+import { generateStyleSuggestions, analyzeUserImage } from '../services/geminiService';
 import { PromptInput } from './PromptInput';
 import { PresetImage } from './PresetImage';
 import { STYLE_PRINCIPLES, STYLES, LUCKY_PROMPTS } from '../data/styleOptions';
@@ -38,6 +39,35 @@ export const StepStyle: React.FC<StepStyleProps> = ({
   useEffect(() => {
     setInputValue(customPrompt || selectedStyle);
   }, [selectedStyle, customPrompt]);
+
+  // Auto-detect gender & recommend style for better initial defaults
+  useEffect(() => {
+    const analyze = async () => {
+      if (userImage) {
+        try {
+          const { gender, recommendedStyleId } = await analyzeUserImage(userImage);
+          if (gender !== 'All') {
+            setActiveTab(gender);
+          }
+          
+          if (recommendedStyleId) {
+             // Find the style details
+             const allItems = STYLES.flatMap(s => s.items);
+             const match = allItems.find(i => i.id === recommendedStyleId);
+             if (match) {
+                 const val = `${match.label} - ${match.desc}`;
+                 setInputValue(val);
+                 setCustomPrompt(''); // Clear custom if we are applying a preset
+                 onSelect(val);
+             }
+          }
+        } catch (e) {
+            console.warn("Auto-analysis failed", e);
+        }
+      }
+    };
+    analyze();
+  }, [userImage]);
 
   const handleInputChange = (val: string) => {
     setInputValue(val);

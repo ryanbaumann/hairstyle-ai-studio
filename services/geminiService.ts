@@ -29,6 +29,76 @@ export const generateTitleFromPrompt = async (promptText: string): Promise<strin
   }
 };
 
+import { STYLES } from "../data/styleOptions";
+
+// ... existing imports
+
+export const analyzeUserImage = async (base64Image: string): Promise<{ gender: 'Men' | 'Women' | 'All'; recommendedStyleId?: string | null }> => {
+  const ai = getAiClient();
+  
+  // Flatten styles for the prompt
+  const availableStyles = STYLES.flatMap(cat => cat.items.map(item => ({
+    id: item.id,
+    label: item.label,
+    desc: item.desc,
+    category: cat.category
+  })));
+
+  try {
+    const [mimeType, data] = base64Image.split(';base64,');
+    
+    const prompt = `
+      Analyze the person in this photo.
+      
+      1. Determine their gender presentation ('Men' or 'Women').
+      2. Recommend the ONE best matching hairstyle from the list below to start with.
+         - Choose a style that would suit their face shape and current hair length, or offer a stylish upgrade.
+         - Don't go too crazy immediately; pick a solid, attractive option.
+         - For men, prefer trending masculine cuts.
+         - For women, prefer trending feminine cuts.
+      
+      Available Styles:
+      ${JSON.stringify(availableStyles.map(s => ({ id: s.id, label: s.label, desc: s.desc, category: s.category })), null, 2)}
+      
+      Return STRICT JSON:
+      {
+        "gender": "Men" | "Women",
+        "recommendedStyleId": "string (must match one of the IDs above)"
+      }
+    `;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-flash-lite-latest',
+      contents: [
+        {
+          inlineData: {
+            mimeType: mimeType.split(':')[1] || 'image/jpeg',
+            data: data
+          }
+        },
+        { text: prompt }
+      ],
+      config: {
+        responseMimeType: 'application/json',
+        thinkingConfig: { thinkingBudget: 0 },
+      }
+    });
+    
+    const text = response.text;
+    if (!text) return { gender: 'All', recommendedStyleId: null };
+    
+    const result = JSON.parse(text);
+    return {
+      gender: result.gender === 'Male' ? 'Men' : (result.gender === 'Female' ? 'Women' : (result.gender || 'All')), // Handle potential 'Male'/'Female' output normalization
+      recommendedStyleId: result.recommendedStyleId || null
+    };
+    
+  } catch (e) {
+    console.warn("Analysis failed, defaulting to All", e);
+    return { gender: 'All', recommendedStyleId: null };
+  }
+};
+
 export const generateStyleSuggestions = async (
   baseContext: string
 ): Promise<HairstyleOption[]> => {
@@ -51,6 +121,7 @@ export const generateStyleSuggestions = async (
       model: 'gemini-flash-lite-latest',
       contents: prompt,
       config: {
+        thinkingConfig: { thinkingBudget: 0 },
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.ARRAY,

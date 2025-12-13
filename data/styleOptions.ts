@@ -38,16 +38,22 @@ export const STYLES = [
         img: 'images/optimized/women/wolf-cut.jpg'
       },
       {
+        id: 'mixie-cut',
+        label: 'The Mixie',
+        desc: 'Bold pixie-mullet hybrid with wispy nape',
+        img: 'images/mixie-cut-woman.png'
+      },
+      {
+        id: 'holographic-shag',
+        label: 'Holographic Shag',
+        desc: 'Edgy shag with silver/pastel iridescent tones',
+        img: 'images/holographic-shag-woman.png'
+      },
+      {
         id: 'copper-shag',
         label: 'Copper Shag',
         desc: '70s inspired shag in vibrant copper',
         img: 'images/optimized/women/copper-shag.jpg'
-      },
-      {
-        id: 'glass-bob',
-        label: 'Glass Bob',
-        desc: 'Ultra-shiny sharp espresso bob',
-        img: 'images/optimized/women/glass-bob.jpg'
       },
       {
         id: 'butterfly-cut',
@@ -77,12 +83,30 @@ export const STYLES = [
         label: 'Italian Bob',
         desc: 'Soft, voluminous neck-length bob',
         img: 'images/optimized/women/italian-bob.jpg'
+      },
+      {
+        id: 'glass-bob',
+        label: 'Glass Bob',
+        desc: 'Ultra-shiny sharp espresso bob',
+        img: 'images/optimized/women/glass-bob.jpg'
       }
     ]
   },
   {
     category: "Men's Trending",
     items: [
+      {
+        id: 'curly-fringe',
+        label: 'Curly Fringe',
+        desc: 'Messy natural curls with high fade',
+        img: 'images/curly-fringe-man.png'
+      },
+      {
+        id: 'soft-pompadour',
+        label: 'Soft Pompadour',
+        desc: 'Matte swept-back volume',
+        img: 'images/soft-pompadour-man.png'
+      },
       {
         id: 'modern-mullet',
         label: 'Modern Mullet',
@@ -94,12 +118,6 @@ export const STYLES = [
         label: 'Textured Crop',
         desc: 'Short matte finish with forward fringe',
         img: 'images/optimized/men/textured-crop.jpg'
-      },
-      {
-        id: 'the-flow',
-        label: 'The Flow',
-        desc: 'Medium length pushed back waves',
-        img: 'images/optimized/men/the-flow.jpg'
       }
     ]
   },
@@ -110,19 +128,25 @@ export const STYLES = [
         id: 'buzz-cut',
         label: 'Buzz Cut',
         desc: 'Clean, uniform short length',
-        img: 'images/optimized/men/textured-crop-classic.jpg' // Reusing textured crop as placeholder for buzz
+        img: 'images/optimized/men/textured-crop-classic.jpg'
       },
       {
         id: 'side-part',
         label: 'Side Part',
         desc: 'Professional taper with defined part',
-        img: 'images/optimized/men/modern-mullet-classic.jpg' // Reusing mullet classic (similar taper)
+        img: 'images/optimized/men/modern-mullet-classic.jpg'
       },
       {
         id: 'long-flow',
         label: 'Long Flow',
         desc: 'Natural long waves with volume',
         img: 'images/optimized/men/long-flow.jpg'
+      },
+      {
+        id: 'the-flow',
+        label: 'The Flow',
+        desc: 'Medium length pushed back styles',
+        img: 'images/optimized/men/the-flow.jpg'
       }
     ]
   }
