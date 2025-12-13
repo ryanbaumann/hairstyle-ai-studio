@@ -155,6 +155,10 @@ export const App = () => {
             isRefining={isRefining}
             onCtaClick={() => setState(prev => ({ ...prev, isMarketingModalOpen: true }))}
             onDeleteHistoryItem={handleDeleteHistoryItem}
+            onApplyStyle={(style) => {
+                setState(prev => ({ ...prev, selectedStyle: style }));
+                handleGenerate(style);
+            }}
           />
         )}
       </main>

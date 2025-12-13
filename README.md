@@ -4,10 +4,11 @@
 
 ## ✨ Features
 
-- **AI-Powered Recommendations**: Leverages Google's Gemini AI to analyze and suggest hairstyles.
-- **Interactive UI**: A sleek, responsive interface built with React and Tailwind CSS.
-- **Real-time Visualization**: Instantly see how different styles might look.
-- **Curated Collection**: Browse through a variety of trending hairstyles for men and women.
+- **Gemini 3 Visual Intelligence**: Uses the latest Gemini 3 model for precise facial analysis and hyper-realistic hairstyle rendering.
+- **Real-time "Thinking" Engine**: See the AI's internal reasoning process in real-time as it crafts your new look.
+- **Interactive Vibe Selection**: Instantly switch between curated trending and classic styles for men and women.
+- **Refinement Suite**: Fine-tune your results with natural language instructions or reference images.
+- **Session History**: Keep track of all your transformations in a persistent local collection.
 
 ## 📸 Screenshots
 
@@ -16,9 +17,9 @@
 
 ### Sample Hairstyles
 <div align="center">
-  <img src="public/images/optimized/wolf-cut-balayage-woman.jpg" width="30%" alt="Wolf Cut" />
-  <img src="public/images/optimized/modern-mullet-man.jpg" width="30%" alt="Modern Mullet" />
-  <img src="public/images/optimized/sleek-glass-bob-woman.jpg" width="30%" alt="Glass Bob" />
+  <img src="public/images/optimized/women/wolf-cut-balayage.jpg" width="30%" alt="Wolf Cut" />
+  <img src="public/images/optimized/men/modern-mullet.jpg" width="30%" alt="Modern Mullet" />
+  <img src="public/images/optimized/women/glass-bob.jpg" width="30%" alt="Glass Bob" />
 </div>
 
 ## 🛠️ Tech Stack

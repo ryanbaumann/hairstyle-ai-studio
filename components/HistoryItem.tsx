@@ -11,10 +11,13 @@ interface HistoryItemProps {
 }
 
 export const HistoryItem: React.FC<HistoryItemProps> = ({ item, isSelected, onSelect, onDelete }) => (
-  <button
+  <div
+      role="button"
+      tabIndex={0}
       onClick={() => onSelect(item)}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onSelect(item); }}
       className={`
-          w-full text-left rounded-xl overflow-hidden border transition-all relative group shadow-sm
+          w-full text-left rounded-xl overflow-hidden border transition-all relative group shadow-sm cursor-pointer
           ${isSelected 
               ? 'border-primary-500 ring-2 ring-primary-500/20 bg-primary-50/50 dark:bg-primary-900/10' 
               : 'border-gray-200 dark:border-gray-800 hover:border-primary-300 dark:hover:border-primary-700 bg-white dark:bg-gray-800'}
@@ -38,5 +41,5 @@ export const HistoryItem: React.FC<HistoryItemProps> = ({ item, isSelected, onSe
             <X size={12} />
           </button>
       </div>
-  </button>
+  </div>
 );

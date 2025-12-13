@@ -99,12 +99,12 @@ export const useAppFlow = () => {
     }));
   }, []);
 
-  const handleGenerate = async () => {
+  const handleGenerate = async (styleOverride?: string) => {
     if (!state.images.front) return;
     setState(prev => ({ ...prev, step: 'generating' }));
     setCurrentThoughts(""); // Clear previous thoughts
 
-    const promptToUse = state.selectedStyle || state.customPrompt;
+    const promptToUse = styleOverride || state.selectedStyle || state.customPrompt;
 
     try {
       const [imageUrl, title] = await Promise.all([

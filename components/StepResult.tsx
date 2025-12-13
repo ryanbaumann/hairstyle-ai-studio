@@ -1,12 +1,13 @@
 
 import React, { useState, useMemo } from 'react';
-import { RotateCcw, Download, History, Calendar, Edit3 } from 'lucide-react';
+import { RotateCcw, Download, History, Calendar, Edit3, Sparkles } from 'lucide-react';
 import { GeneratedImage } from '../types';
 import { PromptInput } from './PromptInput';
 import { MarkdownText } from './MarkdownText';
 import { LoadingSpinner } from './LoadingSpinner';
 import { HistoryItem } from './HistoryItem';
 import { RefinementTools, REFINEMENT_TOOLS } from './RefinementTools';
+import { StyleGrid } from './StyleGrid';
 
 interface StepResultProps {
   result: GeneratedImage;
@@ -17,6 +18,7 @@ interface StepResultProps {
   isRefining: boolean;
   onCtaClick: (type: 'book' | 'pro') => void;
   onDeleteHistoryItem: (id: string, e: React.MouseEvent) => void;
+  onApplyStyle: (style: string) => void;
 }
 
 export const StepResult: React.FC<StepResultProps> = ({ 
@@ -27,11 +29,13 @@ export const StepResult: React.FC<StepResultProps> = ({
   onRefine,
   isRefining,
   onCtaClick,
-  onDeleteHistoryItem
+  onDeleteHistoryItem,
+  onApplyStyle
 }) => {
   const [refinementText, setRefinementText] = useState('');
   const [refImage, setRefImage] = useState<string | null>(null);
   const [refUrl, setRefUrl] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'All' | 'Women' | 'Men'>('All');
 
   const handleDownload = () => {
     const link = document.createElement('a');
@@ -195,6 +199,34 @@ export const StepResult: React.FC<StepResultProps> = ({
               onToggle={toggleRefinement}
               disabled={isRefining}
             />
+        </div>
+
+        {/* Explore Styles Section */}
+        <div className="bg-white/50 dark:bg-slate-900/30 rounded-3xl p-8 border border-gray-100 dark:border-slate-800 shadow-sm">
+             <div className="flex items-center gap-3 mb-8">
+                 <div className="w-10 h-10 bg-primary-100 dark:bg-primary-900/30 rounded-xl flex items-center justify-center text-primary-600 dark:text-primary-400">
+                    <Sparkles size={20} />
+                 </div>
+                 <div>
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">Try a different vibe</h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Switch styles instantly using your original photo</p>
+                 </div>
+             </div>
+             
+             <StyleGrid 
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+                onSelect={(style) => {
+                  setRefinementText(style);
+                  // Optional: smooth scroll to refinement input
+                  const input = document.querySelector('textarea[placeholder*="Describe changes"]');
+                  if (input) {
+                    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    (input as HTMLTextAreaElement).focus();
+                  }
+                }}
+                selectedStyle={result.prompt}
+             />
         </div>
 
       </div>
