@@ -58,7 +58,7 @@ export const StyleGrid: React.FC<StyleGridProps> = ({
             </h3>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {section.items.map((item) => {
-                const isSelected = (selectedStyle || '').includes(item.label);
+                const isSelected = String(selectedStyle || '').includes(item.label);
 
                 return (
                   <div

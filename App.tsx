@@ -122,7 +122,7 @@ export const App = () => {
             styleReferenceUrl={state.styleReferenceUrl}
             onStyleUrlChange={(val) => setState(prev => ({ ...prev, styleReferenceUrl: val }))}
             userImage={state.images.front}
-            onNext={handleGenerate}
+            onNext={() => handleGenerate()}
             onBack={() => setState(prev => ({ ...prev, step: 'upload' }))}
           />
         )}
