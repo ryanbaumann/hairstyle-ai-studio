@@ -184,11 +184,11 @@ export const PromptInput: React.FC<PromptInputProps> = ({
         )}
 
         {/* Toolbar / Actions Footer */}
-        <div className="flex items-center justify-between px-2 py-2 bg-gray-50/50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800 rounded-b-xl">
-            <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-between px-2 py-2 bg-gray-50/50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800 rounded-b-xl gap-2">
+            <div className="flex flex-wrap items-center gap-2">
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-gray-300 transition-all shadow-sm active:scale-95"
+                  className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-gray-300 transition-all shadow-sm active:scale-95 whitespace-nowrap"
                   title="Upload Reference Photo"
                   disabled={isGenerating}
                 >
@@ -198,7 +198,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
 
                 <button
                   onClick={() => setIsLinkInputOpen(true)}
-                  className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-gray-300 transition-all shadow-sm active:scale-95"
+                  className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-gray-300 transition-all shadow-sm active:scale-95 whitespace-nowrap"
                   title="Link Video Style"
                   disabled={isGenerating}
                 >
@@ -207,13 +207,13 @@ export const PromptInput: React.FC<PromptInputProps> = ({
                 </button>
             </div>
 
-            {/* Submit Button (if active) */}
+            {/* Submit Button (Hidden on Mobile if sticky footer exists) */}
             {onSubmit && (
                 <button 
                     onClick={onSubmit}
                     disabled={(!value && !image && !url) || isGenerating}
                     className={`
-                        flex items-center gap-2 px-6 py-2 rounded-xl text-sm font-black uppercase tracking-widest transition-all shadow-lg
+                        hidden sm:flex items-center gap-2 px-6 py-2 rounded-xl text-sm font-black uppercase tracking-widest transition-all shadow-lg ml-auto
                         ${value || image || url 
                             ? 'bg-gradient-to-r from-primary-600 to-indigo-600 text-white hover:from-primary-500 hover:to-indigo-500 shadow-primary-500/30 hover:shadow-primary-500/50 hover:-translate-y-0.5 active:translate-y-0 active:scale-95' 
                             : 'bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed'}
