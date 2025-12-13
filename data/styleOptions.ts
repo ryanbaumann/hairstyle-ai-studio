@@ -29,49 +29,101 @@ export const STYLE_PRINCIPLES = [
 
 export const STYLES = [
   {
-    category: "Trending Women",
+    category: "Women's Trending",
     items: [
       {
         id: 'wolf-cut',
         label: 'Wolf Cut',
-        desc: 'Textured layers with balayage highlights',
-        img: 'images/optimized/wolf-cut-balayage-woman.jpg'
+        desc: 'Textured layers with curtain bangs',
+        img: 'images/optimized/women/wolf-cut.jpg'
       },
       {
         id: 'copper-shag',
         label: 'Copper Shag',
-        desc: 'Textured copper shag hairstyle',
-        img: 'images/optimized/copper-shag-woman.jpg'
+        desc: '70s inspired shag in vibrant copper',
+        img: 'images/optimized/women/copper-shag.jpg'
       },
       {
         id: 'glass-bob',
         label: 'Glass Bob',
-        desc: 'Sleek, espresso glass-hair bob',
-        img: 'images/optimized/sleek-glass-bob-woman.jpg'
+        desc: 'Ultra-shiny sharp espresso bob',
+        img: 'images/optimized/women/glass-bob.jpg'
       },
+      {
+        id: 'butterfly-cut',
+        label: 'Butterfly Cut',
+        desc: 'Voluminous layers and face-framing',
+        img: 'images/optimized/women/butterfly-cut.jpg'
+      }
     ]
   },
   {
-    category: "Trending Men",
+    category: "Women's Classics",
+    items: [
+      {
+        id: 'pixie-cut',
+        label: 'Pixie Cut',
+        desc: 'Chic, textured short crop',
+        img: 'images/optimized/women/pixie-cut.jpg'
+      },
+      {
+        id: 'mermaid-waves',
+        label: 'Mermaid Waves',
+        desc: 'Long, loose beachy waves',
+        img: 'images/optimized/women/mermaid-waves.jpg'
+      },
+      {
+        id: 'italian-bob',
+        label: 'Italian Bob',
+        desc: 'Soft, voluminous neck-length bob',
+        img: 'images/optimized/women/italian-bob.jpg'
+      }
+    ]
+  },
+  {
+    category: "Men's Trending",
     items: [
       {
         id: 'modern-mullet',
         label: 'Modern Mullet',
-        desc: 'Textured back, shorter sides, contemporary fade',
-        img: 'images/optimized/modern-mullet-man.jpg'
+        desc: 'Fade sides, longer back, textured top',
+        img: 'images/optimized/men/modern-mullet.jpg'
       },
       {
         id: 'textured-crop',
         label: 'Textured Crop',
-        desc: 'Skin fade with choppy, matte textured top',
-        img: 'images/optimized/textured-crop-man.jpg'
+        desc: 'Short matte finish with forward fringe',
+        img: 'images/optimized/men/textured-crop.jpg'
       },
       {
         id: 'the-flow',
         label: 'The Flow',
-        desc: 'Medium length, pushed back, natural waves',
-        img: 'images/optimized/long-flow-man.jpg'
+        desc: 'Medium length pushed back waves',
+        img: 'images/optimized/men/the-flow.jpg'
+      }
+    ]
+  },
+  {
+    category: "Men's Classics",
+    items: [
+      {
+        id: 'buzz-cut',
+        label: 'Buzz Cut',
+        desc: 'Clean, uniform short length',
+        img: 'images/optimized/men/textured-crop-classic.jpg' // Reusing textured crop as placeholder for buzz
       },
+      {
+        id: 'side-part',
+        label: 'Side Part',
+        desc: 'Professional taper with defined part',
+        img: 'images/optimized/men/modern-mullet-classic.jpg' // Reusing mullet classic (similar taper)
+      },
+      {
+        id: 'long-flow',
+        label: 'Long Flow',
+        desc: 'Natural long waves with volume',
+        img: 'images/optimized/men/long-flow.jpg'
+      }
     ]
   }
 ];
