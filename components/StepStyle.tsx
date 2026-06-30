@@ -1,10 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { Wand2, Sparkles, Edit3, X, Plus, Check } from 'lucide-react';
+import { Wand2, Sparkles, Edit3, Zap, Crown, Images } from 'lucide-react';
 import { generateStyleSuggestions, analyzeUserImage } from '../services/geminiService';
 import { PromptInput } from './PromptInput';
 import { StyleGrid } from './StyleGrid';
 import { STYLE_PRINCIPLES, STYLES, LUCKY_PROMPTS } from '../data/styleOptions';
+import { GenerationMode, OutputLayout } from '../types';
+import { GENERATION_MODE_LABELS, OUTPUT_LAYOUT_LABELS } from '../services/geminiModels';
 
 interface StepStyleProps {
   onSelect: (style: string) => void;
@@ -18,6 +20,10 @@ interface StepStyleProps {
   userImage?: string | null;
   onNext: () => void;
   onBack: () => void;
+  generationMode: GenerationMode;
+  onGenerationModeChange: (mode: GenerationMode) => void;
+  outputLayout: OutputLayout;
+  onOutputLayoutChange: (layout: OutputLayout) => void;
 }
 
 export const StepStyle: React.FC<StepStyleProps> = ({
@@ -31,7 +37,11 @@ export const StepStyle: React.FC<StepStyleProps> = ({
   onStyleUrlChange,
   userImage,
   onNext,
-  onBack
+  onBack,
+  generationMode,
+  onGenerationModeChange,
+  outputLayout,
+  onOutputLayoutChange
 }) => {
   const [activeTab, setActiveTab] = useState<'All' | 'Women' | 'Men'>('All');
   const [inputValue, setInputValue] = useState(customPrompt || selectedStyle);
@@ -158,6 +168,48 @@ export const StepStyle: React.FC<StepStyleProps> = ({
                 placeholder="e.g. A short, wavy blonde bob with curtain bangs..."
                 />
             </div>
+        </div>
+      </div>
+
+
+      <div className="grid gap-4 md:grid-cols-2 mb-8">
+        <div className="rounded-3xl border border-violet-100 dark:border-violet-900/40 bg-white/80 dark:bg-slate-900/70 p-4 shadow-soft">
+          <div className="flex items-center gap-2 mb-3">
+            <Zap size={16} className="text-primary-500" />
+            <h3 className="text-sm font-black uppercase tracking-wider text-slate-700 dark:text-slate-200">Gemini image model</h3>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {(Object.keys(GENERATION_MODE_LABELS) as GenerationMode[]).map((mode) => (
+              <button
+                key={mode}
+                onClick={() => onGenerationModeChange(mode)}
+                className={`rounded-2xl border px-3 py-3 text-xs font-bold transition-all ${generationMode === mode ? 'border-primary bg-primary text-white shadow-glow' : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-primary-300'}`}
+              >
+                {mode === 'pro' && <Crown size={14} className="mx-auto mb-1" />}
+                {GENERATION_MODE_LABELS[mode]}
+              </button>
+            ))}
+          </div>
+          <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">Studio uses Gemini 3.1 Flash Image; Fast uses the Lite image model; Pro targets Gemini 3 Pro Image.</p>
+        </div>
+
+        <div className="rounded-3xl border border-indigo-100 dark:border-indigo-900/40 bg-white/80 dark:bg-slate-900/70 p-4 shadow-soft">
+          <div className="flex items-center gap-2 mb-3">
+            <Images size={16} className="text-indigo-500" />
+            <h3 className="text-sm font-black uppercase tracking-wider text-slate-700 dark:text-slate-200">Reveal layout</h3>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {(Object.keys(OUTPUT_LAYOUT_LABELS) as OutputLayout[]).map((layout) => (
+              <button
+                key={layout}
+                onClick={() => onOutputLayoutChange(layout)}
+                className={`rounded-2xl border px-3 py-3 text-xs font-bold transition-all ${outputLayout === layout ? 'border-indigo-500 bg-indigo-600 text-white shadow-lg' : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-indigo-300'}`}
+              >
+                {OUTPUT_LAYOUT_LABELS[layout]}
+              </button>
+            ))}
+          </div>
+          <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">Start with a polished single reveal, then regenerate salon sheets or before/after cards when you need them.</p>
         </div>
       </div>
 

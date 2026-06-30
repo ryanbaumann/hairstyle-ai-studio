@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { ArrowRight, Sparkles, Scan, Layers, ImageOff } from 'lucide-react';
+import React from 'react';
+import { ArrowRight, Scan, Layers, ShieldCheck } from 'lucide-react';
 import { ImageUpload } from './ImageUpload';
 import { UploadedImages, ViewType, GeneratedImage } from '../types';
 
@@ -63,11 +63,11 @@ export const StepUpload: React.FC<StepUploadProps> = ({ images, history, onUploa
 
             <div className="flex gap-6 justify-center lg:justify-start pt-1">
                 <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 font-medium text-sm">
-                    <span className="material-icons text-primary text-lg">center_focus_weak</span>
+                    <Scan size={18} className="text-primary" />
                     Face Mapping
                 </div>
                 <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 font-medium text-sm">
-                    <span className="material-icons text-primary text-lg">view_in_ar</span>
+                    <Layers size={18} className="text-primary" />
                     360° Matrix
                 </div>
             </div>
@@ -118,8 +118,8 @@ export const StepUpload: React.FC<StepUploadProps> = ({ images, history, onUploa
                 </div>
 
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-100 dark:border-slate-800">
-                    <p className="text-[10px] text-slate-400 max-w-xs text-center sm:text-left leading-tight">
-                        Photos are processed securely in memory and never stored permanently.
+                    <p className="text-[10px] text-slate-400 max-w-xs text-center sm:text-left leading-tight flex items-center gap-2"><ShieldCheck size={14} className="shrink-0 text-emerald-500" />
+                        Your photos are sent only for Gemini generation and saved locally in this browser history. Use Clear History to remove saved results.
                     </p>
                     <button 
                         className={`w-full sm:w-auto px-8 py-3 rounded-xl font-bold text-base flex items-center justify-center gap-2 transition-all whitespace-nowrap

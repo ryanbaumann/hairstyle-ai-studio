@@ -7,14 +7,14 @@ import dotenv from "dotenv";
 // Load environment variables
 dotenv.config();
 
-const API_KEY = process.env.VITE_GEMINI_API_KEY;
+const API_KEY = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
 if (!API_KEY) {
-  console.error("Error: VITE_GEMINI_API_KEY not found in .env file");
+  console.error("Error: GEMINI_API_KEY or VITE_GEMINI_API_KEY not found in .env file");
   process.exit(1);
 }
 
 const genAI = new GoogleGenAI({ apiKey: API_KEY });
-const IMAGE_MODEL = "gemini-3-pro-image-preview";
+const IMAGE_MODEL = "gemini-3.1-flash-image";
 
 async function generateImage(prompt: string, filename: string) {
   console.log(`Generating image for: ${prompt}`);

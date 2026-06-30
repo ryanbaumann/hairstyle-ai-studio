@@ -1,101 +1,105 @@
 # Hairstyle AI Studio
 
-**Hairstyle AI Studio** is a modern, AI-powered web application that helps users discover and visualize new hairstyles. Built with React, Vite, and Google's Gemini AI, it offers a seamless experience for exploring various hair trends and getting personalized recommendations.
+Hairstyle AI Studio is a modern React + Vite app for trying on hairstyles with Google's Gemini image-generation models. It supports uploaded front/side/back references, curated style presets, free-form style prompting, refinement, downloads, and browser-local history.
 
-## ✨ Features
+## Highlights
 
-- **Gemini 3 Visual Intelligence**: Uses the latest Gemini 3 model for precise facial analysis and hyper-realistic hairstyle rendering.
-- **Real-time "Thinking" Engine**: See the AI's internal reasoning process in real-time as it crafts your new look.
-- **Interactive Vibe Selection**: Instantly switch between curated trending and classic styles for men and women.
-- **Refinement Suite**: Fine-tune your results with natural language instructions or reference images.
-- **Session History**: Keep track of all your transformations in a persistent local collection.
+- **Gemini 3.1 image workflow**: Fast Preview, Studio Quality, and Pro / 4K model modes are centralized in `services/geminiModels.ts`.
+- **Flexible result layouts**: Single Reveal, Salon Sheet, and Before / After generation metadata are built into the flow.
+- **Privacy-aware local history**: Generated images are stored in browser IndexedDB unless you add server storage.
+- **Agent-ready repo docs**: See `AGENTS.md`, `.codex/skills/hairstyle-ai-studio/SKILL.md`, and `CHANGELOG.md`.
 
-## 📸 Screenshots
+## Tech Stack
 
-### Application Interface
-![Hairstyle AI Studio UI](public/images/optimized/ui-screenshot.jpg)
+- React 19
+- Vite
+- TypeScript
+- Tailwind utility classes
+- `@google/genai`
+- Lucide React icons
 
-### Sample Hairstyles
-<div align="center">
-  <img src="public/images/optimized/women/wolf-cut-balayage.jpg" width="30%" alt="Wolf Cut" />
-  <img src="public/images/optimized/men/modern-mullet.jpg" width="30%" alt="Modern Mullet" />
-  <img src="public/images/optimized/women/glass-bob.jpg" width="30%" alt="Glass Bob" />
-</div>
+## Gemini Models
 
-## 🛠️ Tech Stack
+Model names are defined in `services/geminiModels.ts`:
 
-- **Frontend**: React, Vite, Tailwind CSS
-- **AI Integration**: Google Generative AI (Gemini 3 Pro + Flash Lite)
-- **Icons**: Lucide React
-- **Language**: TypeScript
+| UX mode | Model |
+| --- | --- |
+| Fast Preview | `gemini-3.1-flash-lite-image` |
+| Studio Quality | `gemini-3.1-flash-image` |
+| Pro / 4K | `gemini-3-pro-image` |
 
-## 🚀 Getting Started
+Text/title and style-assist calls use the configured fast text model constants in the same file.
 
-### Prerequisites
-
-- Node.js (v18 or later)
-- npm or yarn
-- Google Gemini API Key
-
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/ryanbaumann/hairstyle-ai-studio.git
-   cd hairstyle-ai-studio
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Create a `.env` file in the root directory and add your Gemini API key:
-   ```env
-   VITE_GEMINI_API_KEY=your_api_key_here
-   ```
-
-4. Start the development server:
-   ```bash
-   npm run dev
-   ```
-
-### Building for Production
-
-To create an optimized production build:
+## Local Development
 
 ```bash
-npm run build
+npm install
+cp .env.example .env
+npm run dev
 ```
 
-To preview the production build locally:
+For local demos only, set:
+
+```env
+VITE_GEMINI_API_KEY=your_local_demo_key
+```
+
+> Important: `VITE_*` variables are bundled into frontend code and are visible to browser users. Do not put a production-owned secret in `VITE_GEMINI_API_KEY`.
+
+## Production Secret Handling
+
+For a public deployment, use a server-side API boundary:
+
+1. Store the real key as `GEMINI_API_KEY` in your hosting provider's secret manager.
+2. Create a serverless/API route that calls Gemini from the server.
+3. Have the browser call your route instead of directly calling Gemini with a frontend key.
+4. Validate request sizes and image MIME types before forwarding to Gemini.
+
+The app currently supports direct browser calls for local demos and AI Studio-style key selection. Treat that path as a demo/development mode, not a production secret strategy.
+
+## Scripts
 
 ```bash
-npm run preview
+npm run dev        # local Vite server
+npm run typecheck  # TypeScript validation
+npm run build      # production build
+npm run preview    # preview production build
+npm run check      # typecheck + build
 ```
 
-## 🎨 Image Generation & Optimization
+## Privacy Notes
 
-The project includes scripts to generate new trending hairstyle images using Google's Gemini API and optimize them for the web.
+- User images are sent to Gemini for generation/refinement.
+- Generated history is stored locally in this browser using IndexedDB.
+- Users can delete individual history items or clear all history.
+- Only upload images you own or have permission to process.
 
-### 1. Generate Images
+## Agent Workflow
 
-To generate new images based on prompts in `scripts/generate_images_gemini.ts`:
+Future AI agents should read:
+
+1. `AGENTS.md`
+2. `.codex/skills/hairstyle-ai-studio/SKILL.md`
+3. `services/geminiModels.ts`
+4. `services/geminiService.ts`
+5. `hooks/useAppFlow.ts`
+
+Run `npm run check` before committing changes.
+
+## Image Generation & Optimization
+
+Generate preset images:
 
 ```bash
 npx tsx scripts/generate_images_gemini.ts
 ```
 
-### 2. Optimize Images
-
-To optimize PNG images to JPG and move them to the correct directory:
+Optimize generated images:
 
 ```bash
 sh scripts/optimize-hairstyles.sh
 ```
 
-## 📄 License
+## License
 
-This project is licensed under the MIT License.
-
----
+MIT

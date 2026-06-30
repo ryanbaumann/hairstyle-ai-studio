@@ -210,7 +210,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ view, image, onUpload,
         {!image && !isCameraOpen && (
           <div className="flex flex-col items-center justify-center h-full p-4 group cursor-pointer">
              <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-               <span className="material-icons text-slate-400">{view === 'front' ? 'photo_camera' : 'image'}</span>
+               {view === 'front' ? <Camera className="text-slate-400" size={22} /> : <ImageIcon className="text-slate-400" size={22} />}
              </div>
              
              <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 text-center">Add {view} Photo</p>

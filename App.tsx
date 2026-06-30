@@ -7,7 +7,7 @@ import { StepResult } from './components/StepResult';
 import { MarketingModal } from './components/MarketingModal';
 import { LoadingView } from './components/LoadingView';
 import { useAppFlow } from './hooks/useAppFlow';
-import { Sparkles, ChevronRight, Check, Trash2, Star } from 'lucide-react';
+import { Sparkles, Scissors, ShieldCheck, ChevronRight, Star } from 'lucide-react';
 
 export const App = () => {
   const {
@@ -61,7 +61,7 @@ export const App = () => {
       <nav className="w-full px-6 py-4 flex items-center justify-between bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigateTo('upload')}>
           <div className="w-10 h-10 bg-gradient-to-br from-primary to-indigo-600 rounded-lg flex items-center justify-center text-white shadow-lg">
-            <span className="material-icons text-xl">content_cut</span>
+            <Scissors size={22} />
           </div>
           <span className="text-xl font-bold tracking-tight text-slate-800 dark:text-gray-100">HairStyle AI</span>
         </div>
@@ -74,7 +74,7 @@ export const App = () => {
                 <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs ${state.step === 'upload' ? 'bg-primary text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'}`}>1</span>
                 Upload
            </button>
-           <span className="material-icons text-slate-400 text-xs">chevron_right</span>
+           <ChevronRight size={14} className="text-slate-400" />
            <button 
              onClick={() => navigateTo('style')}
              disabled={!canGoToStyle}
@@ -83,7 +83,7 @@ export const App = () => {
                 <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs ${state.step === 'style' ? 'bg-primary text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'}`}>2</span>
                 Style
            </button>
-           <span className="material-icons text-slate-400 text-xs">chevron_right</span>
+           <ChevronRight size={14} className="text-slate-400" />
            <button 
              onClick={() => navigateTo('result')}
              disabled={!canGoToResult}
@@ -100,6 +100,16 @@ export const App = () => {
       </nav>
 
       <main className="max-w-6xl mx-auto px-4 py-6 md:py-10 pb-20">
+        {state.errorMessage && (
+          <div className="mb-6 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-red-800 shadow-sm dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200">
+            <ShieldCheck size={20} className="mt-0.5 shrink-0" />
+            <div className="flex-1">
+              <p className="font-bold">Something needs attention</p>
+              <p className="text-sm">{state.errorMessage}</p>
+            </div>
+            <button onClick={() => setState(prev => ({ ...prev, errorMessage: null }))} className="text-sm font-bold hover:underline">Dismiss</button>
+          </div>
+        )}
         {state.step === 'upload' && (
           <StepUpload
             images={state.images}
@@ -124,6 +134,10 @@ export const App = () => {
             userImage={state.images.front}
             onNext={() => handleGenerate()}
             onBack={() => setState(prev => ({ ...prev, step: 'upload' }))}
+            generationMode={state.generationMode}
+            onGenerationModeChange={(generationMode) => setState(prev => ({ ...prev, generationMode }))}
+            outputLayout={state.outputLayout}
+            onOutputLayoutChange={(outputLayout) => setState(prev => ({ ...prev, outputLayout }))}
           />
         )}
 
@@ -169,7 +183,7 @@ export const App = () => {
         <div className="w-full bg-gradient-to-r from-primary to-indigo-600 rounded-2xl p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between shadow-lg text-white">
             <div className="flex items-center gap-4 mb-4 sm:mb-0">
                 <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm shrink-0">
-                    <span className="material-icons text-amber-300">star</span>
+                    <Star size={22} className="text-amber-300" fill="currentColor" />
                 </div>
                 <div>
                     <h3 className="font-bold text-lg">Unlock Pro Features</h3>

@@ -16,6 +16,9 @@ export const useAppFlow = () => {
     history: [],
     theme: 'light',
     isMarketingModalOpen: false,
+    generationMode: 'studio',
+    outputLayout: 'single',
+    errorMessage: null,
   });
 
   const [isRefining, setIsRefining] = useState(false);
@@ -76,6 +79,8 @@ export const useAppFlow = () => {
         url: item.id // Use ID as placeholder
       }));
       localStorage.setItem('hairstyle_history', JSON.stringify(metadataOnly));
+    } else {
+      localStorage.removeItem('hairstyle_history');
     }
   }, [state.history]);
 
@@ -113,7 +118,9 @@ export const useAppFlow = () => {
           promptToUse,
           state.styleReferenceImage,
           state.styleReferenceUrl,
-          (thought) => setCurrentThoughts(prev => prev + thought)
+          (thought) => setCurrentThoughts(prev => prev + thought),
+          state.generationMode,
+          state.outputLayout
         ),
         generateTitleFromPrompt(promptToUse)
       ]);
@@ -123,7 +130,9 @@ export const useAppFlow = () => {
         url: imageUrl,
         prompt: promptToUse,
         title: title,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        generationMode: state.generationMode,
+        outputLayout: state.outputLayout
       };
 
       await saveImage(newResult.id, imageUrl);
@@ -136,8 +145,7 @@ export const useAppFlow = () => {
       }));
     } catch (error) {
       console.error(error);
-      alert("Failed to generate hairstyle. Please try again.");
-      setState(prev => ({ ...prev, step: 'style' }));
+      setState(prev => ({ ...prev, step: 'style', errorMessage: 'Generation failed. Please check your Gemini key, image inputs, and network, then try again.' }));
     }
   };
 
@@ -154,7 +162,9 @@ export const useAppFlow = () => {
           instruction,
           refImage,
           refUrl,
-          (thought) => setCurrentThoughts(prev => prev + thought)
+          (thought) => setCurrentThoughts(prev => prev + thought),
+          state.generationMode,
+          state.outputLayout
         ),
         generateTitleFromPrompt(instruction)
       ]);
@@ -164,7 +174,9 @@ export const useAppFlow = () => {
         url: imageUrl,
         prompt: instruction,
         title: title,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        generationMode: state.generationMode,
+        outputLayout: state.outputLayout
       };
 
       await saveImage(newResult.id, imageUrl);
@@ -176,7 +188,7 @@ export const useAppFlow = () => {
       }));
     } catch (error) {
       console.error(error);
-      alert("Failed to refine image.");
+      setState(prev => ({ ...prev, errorMessage: 'Refinement failed. Try a simpler instruction or a different reference image.' }));
     } finally {
       setIsRefining(false);
     }

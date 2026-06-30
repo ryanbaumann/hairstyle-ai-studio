@@ -1,21 +1,27 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { HairstyleOption } from "../types";
+import { GenerationMode, HairstyleOption, OutputLayout } from "../types";
+import { getImageModelForMode, TEXT_FAST_MODEL } from './geminiModels';
 
 // We create a fresh instance every time to ensure we capture the latest API key
 // which might be set via window.aistudio.openSelectKey()
+const getApiKey = () => {
+  const viteKey = import.meta.env.VITE_GEMINI_API_KEY;
+  return viteKey;
+};
+
 const getAiClient = () => {
-  const apiKey = process.env.API_KEY;
+  const apiKey = getApiKey();
   if (!apiKey) {
-    console.warn("API Key not found in process.env");
+    console.warn('Gemini API key not found. Use AI Studio key selection, VITE_GEMINI_API_KEY for local demos, or a server-side GEMINI_API_KEY proxy for production.');
   }
-  return new GoogleGenAI({ apiKey: process.env.API_KEY });
+  return new GoogleGenAI({ apiKey });
 };
 
 export const generateTitleFromPrompt = async (promptText: string): Promise<string> => {
   const ai = getAiClient();
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-flash-lite-latest',
+      model: TEXT_FAST_MODEL,
       contents: `Summarize this hairstyle description into a catchy, specific title of 4 words or less. Description: "${promptText}"`,
       config: {
         thinkingConfig: { thinkingBudget: 0 },
@@ -68,7 +74,7 @@ export const analyzeUserImage = async (base64Image: string): Promise<{ gender: '
     `;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-flash-lite-latest',
+      model: TEXT_FAST_MODEL,
       contents: [
         {
           inlineData: {
@@ -118,7 +124,7 @@ export const generateStyleSuggestions = async (
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-flash-lite-latest',
+      model: TEXT_FAST_MODEL,
       contents: prompt,
       config: {
         thinkingConfig: { thinkingBudget: 0 },
@@ -181,7 +187,9 @@ export const generateHairstyleImage = async (
   styleDescription: string,
   styleReferenceImage: string | null = null,
   styleReferenceUrl: string | null = null,
-  onThinking?: (thought: string) => void
+  onThinking?: (thought: string) => void,
+  generationMode: GenerationMode = 'studio',
+  outputLayout: OutputLayout = 'single'
 ): Promise<string> => {
   const ai = getAiClient();
   
@@ -249,21 +257,21 @@ export const generateHairstyleImage = async (
 
   promptText += `
     Output Requirement:
-    - Generate a single high-resolution image with an aspect ratio of 16:9.
-    - The image MUST be a composite matrix (1x3 grid) showing the Subject with the new hairstyle from three angles:
-      1. Left Panel: Front View
-      2. Center Panel: Side View (Profile)
-      3. Right Panel: Back View
-    - Maintain the Subject's facial identity, features, and expression EXACTLY as in the original images. Do not alter the face.
-    - Only change the hair. Keep lighting and background professional and clean (studio style).
-    - If side or back views were not provided for the subject, infer them realistically while keeping the face consistent with the front view.
+    - Generation mode: ${generationMode}.
+    - Output layout: ${outputLayout}.
+    - Maintain the Subject's facial identity, face shape, age, skin tone, features, and expression exactly as in the original images.
+    - Modify only hair: cut, color, texture, volume, styling, and hairline-adjacent styling.
+    - Keep lighting and background premium, clean, and editorial unless the requested style requires otherwise.
+    - If output layout is single, create one polished front-view reveal.
+    - If output layout is salon-sheet, generate a 1x3 grid with front, side, and back views. Label any inferred view subtly when source side/back views were not provided.
+    - If output layout is before-after, create a clean before/after comparison using the original and transformed look.
   `;
 
   parts.push({ text: promptText });
 
   try {
     const response = await ai.models.generateContentStream({
-      model: 'gemini-3-pro-image-preview',
+      model: getImageModelForMode(generationMode),
       contents: parts,
       config: {
         imageConfig: {
@@ -307,7 +315,9 @@ export const refineHairstyleImage = async (
   refinementInstruction: string,
   styleReferenceImage: string | null = null,
   styleReferenceUrl: string | null = null,
-  onThinking?: (thought: string) => void
+  onThinking?: (thought: string) => void,
+  generationMode: GenerationMode = 'studio',
+  outputLayout: OutputLayout = 'single'
 ): Promise<string> => {
   const ai = getAiClient();
   
@@ -347,16 +357,17 @@ export const refineHairstyleImage = async (
     RULES:
     1. MODIFY ONLY the hair of the subject in the first image according to the instruction. 
     ${styleReferenceImage ? '2. USE the style/texture/color from the second image as the source of truth for the change.' : ''}
-    3. STRICTLY MAINTAIN the 1x3 matrix layout. Do not merge the panels.
-    4. PRESERVE the person's identity, face, and expression exactly. Do not alter facial features.
-    5. If the instruction is about length, color, or style, apply it consistently across all 3 views.
+    3. Preserve the requested output layout (${outputLayout}) unless the user explicitly asks to change it.
+    4. PRESERVE the person's identity, face, expression, age, skin tone, and facial features exactly.
+    5. If the instruction is about length, color, or style, apply it consistently across the visible hair.
+    6. Model quality mode: ${generationMode}.
   `;
 
   parts.push({ text: promptText });
 
   try {
     const response = await ai.models.generateContentStream({
-      model: 'gemini-3-pro-image-preview',
+      model: getImageModelForMode(generationMode),
       contents: parts,
       config: {
         imageConfig: {

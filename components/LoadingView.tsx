@@ -74,7 +74,7 @@ export const LoadingView: React.FC<LoadingViewProps> = ({
         <div className="flex items-center justify-between px-4 py-3 bg-[#161b22] border-b border-gray-800">
            <div className="flex items-center gap-2 text-gray-400">
                <Terminal size={14} />
-               <span className="font-bold text-gray-200">GEMINI NANO BANNA MODEL</span>
+               <span className="font-bold text-gray-200">GEMINI 3.1 IMAGE</span>
            </div>
            <div className="flex gap-1.5">
                <div className="w-2.5 h-2.5 rounded-full bg-red-500/80"></div>
@@ -118,7 +118,7 @@ export const LoadingView: React.FC<LoadingViewProps> = ({
                 <Lock size={10} />
                 <span>E2E ENCRYPTED STREAM</span>
             </div>
-            <span>v3.0.0-preview</span>
+            <span>v3.1-ready</span>
         </div>
       </div>
 

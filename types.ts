@@ -13,9 +13,14 @@ export interface GeneratedImage {
   prompt: string;
   title?: string; // Short AI-generated title
   timestamp: number;
+  generationMode?: GenerationMode;
+  outputLayout?: OutputLayout;
+  model?: string;
 }
 
 export type ViewType = 'front' | 'side' | 'back';
+export type GenerationMode = 'fast' | 'studio' | 'pro';
+export type OutputLayout = 'single' | 'salon-sheet' | 'before-after';
 
 export interface UploadedImages {
   front: string | null; // base64
@@ -30,6 +35,9 @@ export interface AppState {
   customPrompt: string;
   styleReferenceImage: string | null; // New: User uploaded style reference
   styleReferenceUrl: string | null;   // New: YouTube/TikTok URL
+  generationMode: GenerationMode;
+  outputLayout: OutputLayout;
+  errorMessage: string | null;
   generatedResult: GeneratedImage | null;
   history: GeneratedImage[]; // Track versions for undo/redo
   theme: 'light' | 'dark';
